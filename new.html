@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My New HTML Page</title>
+</head>
+<body>
+    <h1>Welcome to my new HTML page!</h1>
+    <button id="myButton">submit</button>
+    
+</body>
+<script>
+    function changeColor() {
+        var button = document.querySelector("#myButton");
+        button.style.color = "blue";
+    }
+
+    // Add event listener to the button
+    document.querySelector("#myButton").addEventListener("click", changeColor);
+</script>
+</body>
+</html>

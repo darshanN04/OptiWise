@@ -22,7 +22,7 @@ const Landing = () => {
   const navigate = useNavigate()
   return (
     <div className='landing'>
-        <h1 className='main_heading'>Welcome to suggesto</h1>
+        <h1 className='main_heading'>Welcome to suggesto1</h1>
         <p className='para'>Here you can suggest your ideas and vote for the best ones!</p>
         <div className='buttons_landing'>
             <button className='login_button' onClick={() => navigate('login')}>Login</button>

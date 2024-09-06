@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function Signup() {
+export default function work() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Signup Page</Text>
-      {/* Add your signup form here */}
+      <Text style={styles.title}>Work</Text>
     </View>
   );
 }

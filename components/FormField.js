@@ -1,12 +1,29 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
+import React, { useState } from 'react'
+import {icons} from '../constants'
+
+
 
 const FormField = ({title, value, placeholder, handleChangeText, otherStyles, ...props}) => {
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <View style={styles.container}>
       <Text style={styles.titlename}>{title}</Text>
       <View style={styles.inputbox}>
-        <TextInput style={styles.inputtext} placeholder={placeholder}>{placeholder}</TextInput>
+        <TextInput  style={styles.inputtext} 
+                    placeholder={placeholder} 
+                    value={value} 
+                    onChangeText={handleChangeText}
+                    secureTextEntry={placeholder==='Enter Password' && !showPassword}> 
+        </TextInput>
+        {placeholder==='Enter Password' && (
+          <TouchableOpacity onPress={()=>
+            setShowPassword(!showPassword)}>
+              <Image source={!showPassword? icons.eye: icons.eyeHide} style={styles.passicon}/>
+            </TouchableOpacity>
+          
+        )}
+
       </View>
     </View>
   )
@@ -16,22 +33,31 @@ export default FormField
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 20,
     },
     titlename: {
         fontSize: 16,
-        marginBottom: 5,
+        paddingLeft: 5,
+        paddingBottom: 0
     },
     inputbox: {
-        width: 100,
-        height: 40,
-        backgroundColor: '#f0f0f0',
+        width: 300,
+        maxHeight: 60,
         borderRadius: 5,
-        marginBottom: 20,
+        borderColor: 'red',
+        borderWidth: 2,
+        flexDirection: "row",
+        flex: 1,
+        alignItems: "center",
+        padding: 10
     },
     inputtext: {
         flex: 1,
         padding: 10,
-        backgroundColor: "black"
     },
+    passicon:{
+      width: 25,
+      height: 25,
+      resizeMode: "contain",
+
+    }
 })

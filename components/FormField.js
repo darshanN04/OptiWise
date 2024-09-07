@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
     },
     inputbox: {
         width: 300,
-        maxHeight: 60,
+        maxHeight: 50,
         borderRadius: 5,
-        borderColor: 'red',
+        borderColor: 'black',
         borderWidth: 2,
         flexDirection: "row",
         flex: 1,
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     },
     inputtext: {
         flex: 1,
-        padding: 10,
+        padding: 5,
     },
     passicon:{
       width: 25,

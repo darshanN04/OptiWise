@@ -2,41 +2,50 @@ import { View, Text, StyleSheet } from 'react-native';
 import FormField from '../../components/FormField.js';
 import { useState } from 'react';
 import { Link } from 'expo-router';
-
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Login() {
-  const [form, setForm]=useState({
+  const [form, setForm] = useState({
     email: "",
     password: ""
-  })
+  });
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.login}>Login</Text>
-        
-        <FormField 
-        placeholder="Enter Email"
-        value={form.email}
-        handleChangeText={(e) => setForm({...form, email: e })}/>
+    <LinearGradient
+      colors={['#BB8CF9', '#58008E']}
+      style={styles.container}
+    >
+      <View style={styles.content}>
+        <Text style={styles.login}>Login</Text>
 
         <FormField
-        placeholder="Enter Password"
-        value={form.password}
-        handleChangeText={(e) => setForm({...form, password: e })}/>
-      
-      <View style={styles.buttonContainer}>
-          <Link href="../(work)/patientReg" style={styles.button}>
+          placeholder="Enter Email"
+          value={form.email}
+          border_c={"red"}
+          handleChangeText={(e) => setForm({ ...form, email: e })}
+        />
+
+        <FormField
+          placeholder="Enter Password"
+          value={form.password}
+          handleChangeText={(e) => setForm({ ...form, password: e })}
+        />
+
+        <View style={styles.buttonContainer}>
+          <Link href="../(tabs)/Registration" style={styles.button}>
             <Text>Submit</Text>
           </Link>
-          
         </View>
-
-    </View>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -46,6 +55,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 40,
     fontWeight: 'bold',
+    color: 'white',
   },
   buttonContainer: {
     flexDirection: 'row',

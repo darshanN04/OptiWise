@@ -12,7 +12,7 @@ export default function Home() {
 
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to</Text>
-        <Text style={styles.title}>OptiWise doctor</Text>
+        <Text style={styles.title}>OptiWise</Text>
 
         <View style={styles.buttonContainer}>
           <Link href="./(auth)/login" style={styles.button}>

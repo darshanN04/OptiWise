@@ -2,14 +2,18 @@
   "name": "server",
   "version": "1.0.0",
   "description": "SERVER-OPTIWISE",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon test/server.js"
   },
+  "type": "module",
   "author": "AMRITH",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.3",
     "dotenv": "^16.4.5",
-    "mongoose": "^8.6.1"
+    "express": "^4.19.2",
+    "mongoose": "^8.6.1",
+    "nodemon": "^3.1.4"
   }
 }

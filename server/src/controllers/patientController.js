@@ -27,8 +27,43 @@ const getAllPatientDetails = async (req, res) => {
     }
   };
   
+  const searchPatientByNameAndPhone = async (req, res) => {
+    const { name, phone_no } = req.query;
+
+    console.log('Received Name:', name);
+    console.log('Received Phone No:', phone_no);
+
+    try {
+        
+        if (!name || !phone_no) {
+            return res.status(400).json({ message: 'Name and phone number are required' });
+        }
+
+        const { data: patients, error } = await supabase
+            .from('patient')
+            .select('*')
+            .eq('name', name)
+            .eq('phone_no', phone_no);
+
+        
+        if (error) {
+            console.error('Supabase Error:', error.message); 
+            return res.status(500).json({ error: error.message });
+        }
+        if (!patients || patients.length === 0) {
+            return res.status(404).json({ message: 'No patients found' });
+        }
+
+        
+        res.json(patients);
+    } catch (error) {
+        console.error('Internal Server Error:', error.message); 
+        res.status(500).json({ error: error.message });
+    }
+};
+
   
   
   
 
-export {getAllPatientDetails}
+export {getAllPatientDetails,searchPatientByNameAndPhone}

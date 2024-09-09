@@ -2,9 +2,9 @@
   "name": "server",
   "version": "1.0.0",
   "description": "SERVER-OPTIWISE",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon test/server.js"
+    "start": "nodemon index.js"
   },
   "type": "module",
   "author": "AMRITH",

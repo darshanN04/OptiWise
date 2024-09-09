@@ -1,5 +1,5 @@
 import express from 'express';
-import { supabase } from '../src/db/supabaseClient.js';
+import { supabase } from '../db/supabaseClient.js';
 
 const app = express();
 

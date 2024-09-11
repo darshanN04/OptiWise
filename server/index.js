@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import patientRoutes from './src/routes/patientRoutes.js';
+import appointmentRoutes from './src/routes/appointmentRoutes.js';
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ app.use(express.json());
 
 // Patient Routes
 app.use('/v1', patientRoutes);
+app.use('/v1', appointmentRoutes); 
 
 
 

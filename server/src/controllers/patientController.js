@@ -2,26 +2,23 @@ import { supabase } from '../db/supabaseClient.js';
 
 const getAllPatientDetails = async (req, res) => {
     try {
-        //Patients
         const { data: patients, error: patientError } = await supabase.from('patient').select('*');
-
         if (patientError) throw patientError;
         if (!patients || patients.length === 0) {
-            return res.status(404).json({ message: 'No user exists' });
+            return res.status(404).json({ message: 'No patients found' });
         }
-
-        const { data: patientAdditional, error: additionalError } = await supabase.from('patient_additional').select('*');
+        const { data: additionalDetails, error: additionalError } = await supabase.from('additional_details').select('*');
         if (additionalError) throw additionalError;
         const combinedData = patients.map(patient => {
-            const additionalDetails = patientAdditional.find(add => add.patient_id === patient.patient_id) || {};
-            return { ...patient, ...additionalDetails };
+            const additional = additionalDetails.find(add => add.patient_id === patient.patient_id) || {};
+            return { ...patient, ...additional };
         });
 
         res.json(combinedData);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};
+}
 
 
 const searchPatientByNameAndPhone = async (req, res) => {

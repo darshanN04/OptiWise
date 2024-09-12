@@ -87,7 +87,7 @@ const patientReg = () => {
                 mode="date"
                 display="default"
                 onChange={onChange}
-                maximumDate={new Date()} // Ensure future dates can't be selected
+                maximumDate={new Date()} 
               />
             )}
           </View>
@@ -101,6 +101,19 @@ const patientReg = () => {
                 placeholder=""
                 value={details.p_fathername}
                 onChangeText={(e) => setDetails({ ...details, p_fathername: e })}
+              />
+            </View>
+          </View>
+
+          {/* Gender */}
+          <View>
+            <Text style={{ fontSize: 16 }}>Gender: </Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.inputField}
+                placeholder=""
+                value={details.p_gender}
+                onChangeText={(e) => setDetails({ ...details, p_gender: e })}
               />
             </View>
           </View>

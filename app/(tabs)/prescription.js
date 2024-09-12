@@ -2,6 +2,8 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Touch
 import React, { useState } from 'react';
 import cal from "../../assets/icons/calender.png";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
@@ -12,6 +14,28 @@ const Prescription = () => {
     pres_patientname: "",
     pres_patientid: 0,
   });
+  const [selectedRightDV, setSelectedRightDV] = useState({});
+  const [selectedRightNV, setSelectedRightNV] = useState({});
+  const [selectedLeftDV, setSelectedLeftDV] = useState({});
+  const [selectedLeftNV, setSelectedLeftNV] = useState({});
+  const data = [
+    { id: 1, visualAcuity: 'Unaided Visual Acuity (Without glasses)', rightDV: '20/30', rightNV: '20/40', leftDV: '20/25', leftNV: '20/35' },
+    { id: 2, visualAcuity: 'Best corrected Visual Acuity (With old glasses)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
+    { id: 3, visualAcuity: 'Corrected Visual Acuity (With new correction)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
+  ];
+  const visualOptions = ['6/5', '6/6', '6/12', '6/24', '6/36', '6/48', '6/60', '3/60', '2/60', '1/60', 'HM', 'PL', 'NPL'];
+  const handlePickerChange = (side, type, value, id) => {
+    switch (side) {
+      case 'right':
+        if (type === 'DV') setSelectedRightDV({ ...selectedRightDV, [id]: value });
+        else setSelectedRightNV({ ...selectedRightNV, [id]: value });
+        break;
+      case 'left':
+        if (type === 'DV') setSelectedLeftDV({ ...selectedLeftDV, [id]: value });
+        else setSelectedLeftNV({ ...selectedLeftNV, [id]: value });
+        break;
+    }
+  };
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -86,7 +110,7 @@ const Prescription = () => {
           {/* Patient Name */}
           <View>
             <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient Name: </Text>
-            <View style={{width: width*.8,maxHeight: 50,borderRadius: 5,borderColor: 'black',borderWidth: 2,paddingLeft: 5,flexDirection: "row",alignItems: "center",marginBottom: 15,}}>
+            <View style={{width: width*.82,maxHeight: 50,borderRadius: 5,borderColor: 'black',borderWidth: 2,paddingLeft: 5,flexDirection: "row",alignItems: "center",marginBottom: 15,}}>
               <TextInput
                 style={styles.inputField}
                 placeholder=""
@@ -98,7 +122,7 @@ const Prescription = () => {
 
           {/* Patient ID */}
           <View>
-            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>ID: </Text>
+            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 0 }}>ID: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
@@ -109,6 +133,84 @@ const Prescription = () => {
               />
             </View>
           </View>
+
+          {/* Visual Acuity Table */}
+
+          <View>
+            <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity</Text>
+          </View>
+          <ScrollView horizontal={true} style={{ flex: 1, marginTop: 20, paddingHorizontal: 10 , marginRight: width*0.07}}>
+            <View style={{ borderWidth: 1, borderColor: 'black' }}>
+              {/* Table Header */}
+              <View style={{ flexDirection: 'row', backgroundColor: '#f8f8f8', borderBottomWidth: 1, borderColor: '#000' }}>
+                <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 1, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
+                <View style={{ width: 300, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Right</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: 'bold', width: 150, textAlign: 'center', borderWidth: 1, borderColor: 'black' }}>DV</Text>
+                    <Text style={{ fontWeight: 'bold', width: 150, textAlign: 'center', borderWidth: 1, borderColor: 'black' }}>NV</Text>
+                  </View>
+                </View>
+                <View style={{ width: 300, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Left</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: 'bold', width: 150, textAlign: 'center', borderWidth: 1, borderColor: '#000' }}>DV</Text>
+                    <Text style={{ fontWeight: 'bold', width: 150, textAlign: 'center', borderWidth: 1, borderColor: '#000' }}>NV</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Table Rows */}
+              {data.map((item) => (
+                <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ddd' }}>
+                  <Text style={{ padding: 10, borderWidth: 1, borderColor: '#ddd', width: 100, textAlign: 'center', fontSize: 10 }}>{item.visualAcuity}</Text>
+
+                  {/* Right Eye Pickers */}
+                  <Picker
+                    selectedValue={selectedRightDV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(value) => handlePickerChange('right', 'DV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>
+
+                  <Picker
+                    selectedValue={selectedRightNV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(value) => handlePickerChange('right', 'NV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>
+
+                  {/* Left Eye Pickers */}
+                  <Picker
+                    selectedValue={selectedLeftDV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(value) => handlePickerChange('left', 'DV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>
+
+                  <Picker
+                    selectedValue={selectedLeftNV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 150 }}
+                    onValueChange={(value) => handlePickerChange('left', 'NV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+
 
         </View>
       </ScrollView>
@@ -134,6 +236,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     flex: 1,
     flexDirection: "row",
-    color: "black"
+    color: "black",
+    
   },
 });

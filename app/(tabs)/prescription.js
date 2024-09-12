@@ -85,7 +85,7 @@ const Prescription = () => {
 
           {/* Patient Name */}
           <View>
-            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Name: </Text>
+            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient Name: </Text>
             <View style={{width: width*.8,maxHeight: 50,borderRadius: 5,borderColor: 'black',borderWidth: 2,paddingLeft: 5,flexDirection: "row",alignItems: "center",marginBottom: 15,}}>
               <TextInput
                 style={styles.inputField}

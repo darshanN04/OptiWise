@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Butto
 import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios'; // Import axios
+import { Picker } from '@react-native-picker/picker';
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
@@ -138,12 +139,16 @@ const patientReg = () => {
           <View>
             <Text style={{ fontSize: 16 }}>Gender: </Text>
             <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.inputField}
-                placeholder=""
-                value={details.gender}
-                onChangeText={(e) => setDetails({ ...details, gender: e })}
-              />
+              <Picker
+                selectedValue={details.gender}
+                style={styles.inputField}  // Reuse your inputField style
+                onValueChange={(itemValue) => setDetails({ ...details, gender: itemValue })}
+              >
+                <Picker.Item label="Select Gender" value="" />
+                <Picker.Item label="Male" value="Male" />
+                <Picker.Item label="Female" value="Female" />
+                <Picker.Item label="Other" value="Other" />
+              </Picker>
             </View>
           </View>
 

@@ -1,14 +1,32 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import FormField from '../../constants/FormField.js';
 import { useState } from 'react';
-import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { supabase } from '../../sb/spClient.js';
+import { router } from 'expo-router'
 
-export default function Login() {
+export default function Login({ navigation }) { 
   const [form, setForm] = useState({
     email: "",
     password: ""
   });
+
+    const logIn = async (email, password) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;}
+        Alert.alert('Login Success', 'You are now logged in!');
+        router.push('../(tabs)/Registration')
+    } catch (error) {
+      console.error('Login error:', error.message);
+      Alert.alert('Login Error', error.message);
+    }
+  };
 
   return (
     <LinearGradient
@@ -29,12 +47,16 @@ export default function Login() {
           placeholder="Enter Password"
           value={form.password}
           handleChangeText={(e) => setForm({ ...form, password: e })}
+          secureTextEntry
         />
 
         <View style={styles.buttonContainer}>
-          <Link href="../(tabs)/Registration" style={styles.button}>
-            <Text>Submit</Text>
-          </Link>
+          <Pressable
+            onPress={() => logIn(form.email, form.password)} 
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
+          </Pressable>
         </View>
       </View>
     </LinearGradient>
@@ -65,12 +87,14 @@ const styles = StyleSheet.create({
   button: {
     padding: 10,
     backgroundColor: '#007bff',
-    color: 'white',
-    textAlign: 'center',
     borderRadius: 5,
     margin: 10,
     width: 100,
     marginTop: 50,
-    fontSize: 15
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 15,
   },
 });

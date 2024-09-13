@@ -56,16 +56,16 @@ const patientReg = () => {
     }
   };
 
-  const testConnection = async () => {
-    try {
-      const response = await axios.get('http://10.0.2.2:7000/test');
-      console.log(response.data);
-      alert('Connection test successful');
-    } catch (error) {
-      console.error('Test connection error:', error.response || error.message);
-      alert('Error connecting to the server.');
-    }
-  };
+  // const testConnection = async () => {
+  //   try {
+  //     const response = await axios.get('http://10.0.2.2:7000/test');
+  //     console.log(response.data);
+  //     alert('Connection test successful');
+  //   } catch (error) {
+  //     console.error('Test connection error:', error.response || error.message);
+  //     alert('Error connecting to the server.');
+  //   }
+  // };
 
   return (
     <View style={{ flex: 1 }}>
@@ -254,13 +254,13 @@ const patientReg = () => {
               <Text style={{ color: 'white', fontSize: 18 }}>Submit</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Test Connection Button */}
-          <View style={styles.buttonContainer}>
+{/* 
+          Test Connection Button */}
+          {/* <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={testConnection} style={styles.button}>
               <Text style={{ color: 'white', fontSize: 18 }}>Test Connection</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
         </View>
       </ScrollView>

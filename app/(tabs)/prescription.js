@@ -139,7 +139,7 @@ const Prescription = () => {
           <View>
             <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity</Text>
           </View>
-          <ScrollView horizontal={true} style={{ flex: 1, marginTop: 20, paddingHorizontal: 10 , marginRight: width*0.07}}>
+          <ScrollView horizontal={true} style={{ flex: 1, marginTop: 20, paddingHorizontal: 0 , marginRight: width*0.03}}>
             <View style={{ borderWidth: 1, borderColor: 'black' }}>
               {/* Table Header */}
               <View style={{ flexDirection: 'row', backgroundColor: '#f8f8f8', borderBottomWidth: 1, borderColor: '#000' }}>
@@ -162,8 +162,8 @@ const Prescription = () => {
 
               {/* Table Rows */}
               {data.map((item) => (
-                <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ddd' }}>
-                  <Text style={{ padding: 10, borderWidth: 1, borderColor: '#ddd', width: 100, textAlign: 'center', fontSize: 10 }}>{item.visualAcuity}</Text>
+                <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 10 }}>{item.visualAcuity}</Text>
 
                   {/* Right Eye Pickers */}
                   <Picker

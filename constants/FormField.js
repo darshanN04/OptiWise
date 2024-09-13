@@ -10,20 +10,20 @@ const FormField = ({title, value, placeholder, handleChangeText, otherStyles, ..
     <View style={styles.container}>
       <Text style={styles.titlename}>{title}</Text>
       <View style={styles.inputbox}>
-        <TextInput  style={styles.inputtext} 
-                    placeholder={placeholder} 
-                    value={value} 
-                    onChangeText={handleChangeText}
-                    secureTextEntry={placeholder==='Enter Password' && !showPassword}> 
+        <TextInput  
+          style={styles.inputtext} 
+          placeholder={placeholder} 
+          placeholderTextColor="white" 
+          value={value} 
+          onChangeText={handleChangeText}
+          secureTextEntry={placeholder==='Enter Password' && !showPassword}> 
         </TextInput>
         {placeholder==='Enter Password' && (
           <TouchableOpacity onPress={()=>
             setShowPassword(!showPassword)}>
               <Image source={!showPassword? icons.eye: icons.eyeHide} style={styles.passicon}/>
             </TouchableOpacity>
-          
         )}
-
       </View>
     </View>
   )
@@ -43,14 +43,15 @@ const styles = StyleSheet.create({
         width: 300,
         maxHeight: 50,
         borderRadius: 5,
-        borderColor: 'black',
+        borderColor: 'white',
         borderWidth: 2,
         flexDirection: "row",
         flex: 1,
         alignItems: "center",
-        padding: 10
-    },
-    inputtext: {
+        padding: 10,
+      },
+      inputtext: {
+        color:"white",
         flex: 1,
         padding: 5,
     },

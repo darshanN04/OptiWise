@@ -49,6 +49,55 @@ const searchPatientByNameAndPhone = async (req, res) => {
 };
 
 
+const registerPatient = async (req, res) => {
+    console.log(req.body);
+    const {
+      name,
+      dob,
+      gender,
+      aadhaar_no,
+      phone_no,
+      occupation,
+      address,
+      father_name,
+      photograph,
+      email,
+      emergency_name,
+      emergency_phone,
+      emergency_relation
+    } = req.body;
+    
+    try {
+      // Call the Supabase function 'patient_registration' with all the parameters
+      const { data: patient_id, error } = await supabase.rpc('patient_registration', {
+        p_name: name,
+        p_dob: dob,
+        p_gender: gender,
+        p_aadhaar_no: aadhaar_no,
+        p_phone_no: phone_no,
+        p_occupation: occupation,
+        p_address: address,
+        p_father_name: father_name,
+        p_photograph: photograph,
+        p_email: email,
+        p_e_name: emergency_name,
+        p_e_phone: emergency_phone,
+        p_e_relation: emergency_relation
+      });
+      console.log(error);
+      if (error) throw error;
+  
+      if (patient_id === -1) {
+        return res.status(400).json({ message: 'Patient already exists' });
+      }
+  
+      // Return success message with patient_id
+      res.status(200).json({ message: 'Patient registered successfully', patient_id });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 
-export { getAllPatientDetails, searchPatientByNameAndPhone }
+
+export { getAllPatientDetails, searchPatientByNameAndPhone ,registerPatient}

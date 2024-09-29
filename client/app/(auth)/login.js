@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -14,6 +14,9 @@ export default function Login({ navigation }) {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const hideSplash = async () => {
@@ -23,6 +26,12 @@ export default function Login({ navigation }) {
   }, []);
 
   const logIn = async (email, password) => {
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.");
+      setErrorModalVisible(true);
+      return;
+    }
+
     try {
       const response = await fetch('http://192.168.0.170:7002/v1/doctor/login', {
         method: 'POST',
@@ -35,13 +44,18 @@ export default function Login({ navigation }) {
       const result = await response.json();
 
       if (response.ok) {
-        Alert.alert('Login Success', 'You are now logged in!');
-        router.push('../(tabs)/Registration'); 
+        setSuccessModalVisible(true); // Show the success modal
+        setTimeout(() => {
+          setSuccessModalVisible(false);
+          router.push('../(tabs)/Registration'); // Redirect after a brief delay
+        }, 2000); // Close the modal after 2 seconds
       } else {
-        Alert.alert('Login Error', result.error); 
+        setErrorMessage(result.error);
+        setErrorModalVisible(true); // Show the error modal
       }
     } catch (error) {
-      Alert.alert('Login Error', error.message);
+      setErrorMessage(error.message);
+      setErrorModalVisible(true); // Show the error modal
     }
   };
 
@@ -91,6 +105,41 @@ export default function Login({ navigation }) {
           </Pressable>
         </View>
       </View>
+
+      {/* Success Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successModalVisible}
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Login Successful!</Text>
+            <Ionicons name="checkmark-circle" size={40} color="green" />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={() => setErrorModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{errorMessage}</Text>
+            <Pressable
+              onPress={() => setErrorModalVisible(false)} 
+              style={styles.errorButton}
+            >
+              <Text style={styles.errorButtonText}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -146,11 +195,7 @@ const styles = StyleSheet.create({
   inputField: {
     flex: 1,
     padding: 0,
-    color: 'black', // Text color for the input field
-  },
-  passwordContainer: {
-    position: 'relative',
-    width: '80%',
+    color: 'black', 
   },
   eyeIcon: {
     position: 'absolute',
@@ -179,5 +224,41 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)', 
+  },
+  modalContent: {
+    width: 250,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    color: 'black',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  errorButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f44336',
+    borderRadius: 21,
+  },
+  errorButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });

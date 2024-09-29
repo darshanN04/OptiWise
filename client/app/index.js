@@ -1,7 +1,9 @@
 import { Link } from 'expo-router';
-import { View, Text, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
 import "../assets/images/Logo.png";
+
 export default function Home() {
   return (
     <LinearGradient
@@ -16,9 +18,8 @@ export default function Home() {
 
         <View style={styles.buttonContainer}>
           <Link href="./(auth)/login" style={styles.button}>
-            <Text>Login</Text>
+            <Ionicons name="arrow-forward-outline" size={30} color="white" style={styles.icon} />
           </Link>
-          
         </View>
       </View>
     </LinearGradient>
@@ -54,14 +55,22 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   button: {
-    padding: 10,
+    flexDirection: 'row', // Keep items in a row
+    alignItems: 'center', // Center items vertically
+    padding: 15,
     backgroundColor: '#007bff',
-    color: 'white',
-    textAlign: 'center',
-    borderRadius: 5,
+    borderRadius: 80,
     margin: 10,
-    width: 100,
-    marginTop: 50,
-    fontSize: 15
+    width: 80,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    justifyContent: 'center', // Center the icon in the button
+  },
+  icon: {
+    // No additional styles needed for icon
   },
 });

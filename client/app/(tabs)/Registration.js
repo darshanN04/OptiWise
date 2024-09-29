@@ -40,7 +40,7 @@ const patientReg = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://10.0.2.2:7000/v1/patients/register', details 
+      const response = await axios.post('http://192.168.0.170:7002/v1/patients/register', details 
         
       );
       console.log(details);

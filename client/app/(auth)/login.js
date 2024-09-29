@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
-import FormField from '../../constants/FormField.js';
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { Ionicons } from '@expo/vector-icons';
 
-SplashScreen.preventAutoHideAsync();  // Keep the splash screen visible
+SplashScreen.preventAutoHideAsync();
 
 export default function Login({ navigation }) { 
   const [form, setForm] = useState({
@@ -13,11 +13,13 @@ export default function Login({ navigation }) {
     password: ""
   });
 
-  const [fontsLoaded, setFontsLoaded] = useState(true); 
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Hide the splash screen immediately
   useEffect(() => {
-    SplashScreen.hideAsync();
+    const hideSplash = async () => {
+      await SplashScreen.hideAsync();
+    };
+    hideSplash();
   }, []);
 
   const logIn = async (email, password) => {
@@ -39,15 +41,9 @@ export default function Login({ navigation }) {
         Alert.alert('Login Error', result.error); 
       }
     } catch (error) {
-      console.error('Login error:', error.message);
       Alert.alert('Login Error', error.message);
     }
   };
-
-  // Show a loading indicator while fonts are loading (not needed here, but keeping for structure)
-  if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#BB8CF9" />;
-  }
 
   return (
     <LinearGradient
@@ -55,28 +51,43 @@ export default function Login({ navigation }) {
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.login}>Login</Text>
+        <Text style={styles.welcomeBackText}>Welcome Back</Text>
+        <Text style={styles.loginInstructionText}>Please login to your account</Text>
 
-        <FormField
-          placeholder="Enter Email"
-          value={form.email}
-          border_c={"#ddd"}
-          handleChangeText={(e) => setForm({ ...form, email: e })}
-        />
+        <Text style={styles.label}>EMAIL</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="mail" size={20} color="gray" style={styles.inputIcon} />
+          <TextInput
+            value={form.email}
+            onChangeText={(e) => setForm({ ...form, email: e })}
+            style={styles.inputField}
+            placeholder="Enter your email"
+            placeholderTextColor="gray"
+          />
+        </View>
 
-        <FormField
-          placeholder="Enter Password"
-          value={form.password}
-          handleChangeText={(e) => setForm({ ...form, password: e })}
-          secureTextEntry
-        />
+        <Text style={styles.label}>PASSWORD</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="lock-closed" size={20} color="gray" style={styles.inputIcon} />
+          <TextInput
+            value={form.password}
+            onChangeText={(e) => setForm({ ...form, password: e })}
+            secureTextEntry={!showPassword}
+            style={styles.inputField}
+            placeholder="Enter your password"
+            placeholderTextColor="gray"
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="gray" />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.buttonContainer}>
           <Pressable
             onPress={() => logIn(form.email, form.password)} 
             style={styles.button}
           >
-            <Text style={styles.buttonText}>Submit</Text>
+            <Text style={styles.buttonText}>LOGIN</Text>
           </Pressable>
         </View>
       </View>
@@ -92,12 +103,59 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 50,
+    paddingBottom: 80,
+    paddingTop: 50,
   },
-  login: {
-    fontSize: 30,
-    marginBottom: 40,
+  welcomeBackText: {
+    fontSize: 24,
     color: 'white',
+    textAlign: 'center',
+    marginBottom: 10,
+    fontFamily: 'Roboto', 
+    fontWeight: 'normal',
+  },
+  loginInstructionText: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+    fontFamily: 'Roboto',
+  },
+  label: {
+    alignSelf: 'flex-start',
+    color: 'white',
+    marginBottom: 5,
+    marginLeft: '10%',
+    fontFamily: 'Roboto',
+  },
+  inputContainer: {
+    width: '80%',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  inputField: {
+    flex: 1,
+    padding: 0,
+    color: 'black', // Text color for the input field
+  },
+  passwordContainer: {
+    position: 'relative',
+    width: '80%',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -107,10 +165,10 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     backgroundColor: '#007bff',
-    borderRadius: 8,
+    borderRadius: 80,
     margin: 10,
-    width: 120,
-    marginTop: 50,
+    width: 150,
+    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,

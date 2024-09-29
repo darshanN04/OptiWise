@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
 import FormField from '../../constants/FormField.js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { supabase } from '../../sb/spClient.js';
-import { router } from 'expo-router'
+import { router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();  // Keep the splash screen visible
 
 export default function Login({ navigation }) { 
   const [form, setForm] = useState({
@@ -11,22 +13,41 @@ export default function Login({ navigation }) {
     password: ""
   });
 
-    const logIn = async (email, password) => {
+  const [fontsLoaded, setFontsLoaded] = useState(true); 
+
+  // Hide the splash screen immediately
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
+  const logIn = async (email, password) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('http://192.168.0.170:7002/v1/doctor/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        throw error;}
+      const result = await response.json();
+
+      if (response.ok) {
         Alert.alert('Login Success', 'You are now logged in!');
-        router.push('../(tabs)/Registration')
+        router.push('../(tabs)/Registration'); 
+      } else {
+        Alert.alert('Login Error', result.error); 
+      }
     } catch (error) {
       console.error('Login error:', error.message);
       Alert.alert('Login Error', error.message);
     }
   };
+
+  // Show a loading indicator while fonts are loading (not needed here, but keeping for structure)
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#BB8CF9" />;
+  }
 
   return (
     <LinearGradient
@@ -39,7 +60,7 @@ export default function Login({ navigation }) {
         <FormField
           placeholder="Enter Email"
           value={form.email}
-          border_c={"red"}
+          border_c={"#ddd"}
           handleChangeText={(e) => setForm({ ...form, email: e })}
         />
 
@@ -71,12 +92,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 50
+    paddingBottom: 50,
   },
   login: {
-    fontSize: 24,
+    fontSize: 30,
     marginBottom: 40,
-    fontWeight: 'bold',
     color: 'white',
   },
   buttonContainer: {
@@ -85,16 +105,21 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   button: {
-    padding: 10,
+    padding: 15,
     backgroundColor: '#007bff',
-    borderRadius: 5,
+    borderRadius: 8,
     margin: 10,
-    width: 100,
+    width: 120,
     marginTop: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   buttonText: {
     color: 'white',
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: 16,
   },
 });

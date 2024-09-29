@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // Importing cors
 import patientRoutes from './src/routes/patientRoutes.js';
 import appointmentRoutes from './src/routes/appointmentRoutes.js';
+import doctorRoutes from './src/routes/doctorRoutes.js'
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors({
 
 app.use('/v1', patientRoutes);
 app.use('/v1', appointmentRoutes);
+app.use('/v1', doctorRoutes);
 app.get('/test', (req, res) => {
     res.json({ message: 'Test route is working' });
   });

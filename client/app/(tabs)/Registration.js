@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios'; // Import axios
 import { Picker } from '@react-native-picker/picker';
-
+import { API_URL, PORT } from '@env';
 const { width } = Dimensions.get('window'); // Get the screen width
 
 const patientReg = () => {
@@ -40,7 +40,7 @@ const patientReg = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://192.168.0.170:7002/v1/patients/register', details 
+      const response = await axios.post(`${API_URL}:${PORT}/v1/patients/register`, details 
         
       );
       console.log(details);

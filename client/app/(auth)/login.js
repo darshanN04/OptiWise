@@ -4,6 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL, PORT } from '@env';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,6 +29,8 @@ export default function Login({ navigation }) {
   }, []);
 
   const logIn = async (email, password) => {
+    console.log('logIn function called with:', email, password); // Debugging log
+
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setErrorModalVisible(true);
@@ -33,7 +38,7 @@ export default function Login({ navigation }) {
     }
 
     try {
-      const response = await fetch('http://192.168.0.170:7002/v1/doctor/login', {
+      const response = await fetch(`${API_URL}:${PORT}/v1/doctor/login`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,17 +48,25 @@ export default function Login({ navigation }) {
 
       const result = await response.json();
 
+
       if (response.ok) {
+        console.log('Login successful'); // Debugging log
+        // Store the access token and email
+        await AsyncStorage.setItem('accessToken', result.accessToken);
+        await AsyncStorage.setItem('doctorEmail', result.email);
+
         setSuccessModalVisible(true); // Show the success modal
         setTimeout(() => {
           setSuccessModalVisible(false);
           router.push('../(tabs)/Registration'); // Redirect after a brief delay
         }, 2000); // Close the modal after 2 seconds
       } else {
+        console.log('Login failed:', result.error); // Debugging log
         setErrorMessage(result.error);
         setErrorModalVisible(true); // Show the error modal
       }
     } catch (error) {
+      console.log('Error during login:', error.message); // Debugging log
       setErrorMessage(error.message);
       setErrorModalVisible(true); // Show the error modal
     }
@@ -73,7 +86,9 @@ export default function Login({ navigation }) {
           <Ionicons name="mail" size={20} color="gray" style={styles.inputIcon} />
           <TextInput
             value={form.email}
-            onChangeText={(e) => setForm({ ...form, email: e })}
+            onChangeText={(e) => {
+              setForm({ ...form, email: e });
+            }}
             style={styles.inputField}
             placeholder="Enter your email"
             placeholderTextColor="gray"
@@ -85,24 +100,30 @@ export default function Login({ navigation }) {
           <Ionicons name="lock-closed" size={20} color="gray" style={styles.inputIcon} />
           <TextInput
             value={form.password}
-            onChangeText={(e) => setForm({ ...form, password: e })}
+            onChangeText={(e) => {
+              setForm({ ...form, password: e });
+            }}
             secureTextEntry={!showPassword}
             style={styles.inputField}
             placeholder="Enter your password"
             placeholderTextColor="gray"
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+          <TouchableOpacity onPress={() => {
+            setShowPassword(!showPassword);
+          }} style={styles.eyeIcon}>
             <Ionicons name={showPassword ? "eye-off" : "eye"} size={24} color="gray" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>
-          <Pressable
-            onPress={() => logIn(form.email, form.password)} 
+          <TouchableOpacity
+            onPress={() => {
+              logIn(form.email, form.password);
+            }}
             style={styles.button}
           >
             <Text style={styles.buttonText}>LOGIN</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
 

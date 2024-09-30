@@ -2,6 +2,7 @@ import { supabase } from '../db/supabaseClient.js';
 
 const loginDoctor = async (req, res) => {
   const { email, password } = req.body;
+  console.log('Login request received:', { email, password }); // Log request
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -10,13 +11,22 @@ const loginDoctor = async (req, res) => {
     });
 
     if (error) {
+      console.log('Login error:', error.message);
       return res.status(400).json({ error: error.message });
     }
 
+    const accessToken = data.session.access_token;
+    const userEmail = data.user.email;
+    
+    console.log('Login successful:', { accessToken, userEmail });
+    
     res.status(200).json({
       message: 'Doctor login successful',
+      accessToken,
+      email: userEmail,
     });
   } catch (error) {
+    console.log('Server error:', error.message);
     res.status(500).json({ error: error.message });
   }
 };

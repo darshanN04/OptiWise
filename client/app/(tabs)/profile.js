@@ -1,30 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Modal } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL, PORT } from '@env';
 
 const { width } = Dimensions.get('window');
 
-const Profile = ({ doctor }) => {
+const Profile = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
-  const [email, setEmail] = useState(''); // Added state variable for email
+  const [email, setEmail] = useState('');
+  const [doctor, setDoctor] = useState(null); // Default to null for conditional rendering
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
-    const getAccessToken = async () => {
+    const fetchDoctorProfile = async () => {
       try {
         const token = await AsyncStorage.getItem('accessToken');
         const storedEmail = await AsyncStorage.getItem('doctorEmail');
         setAccessToken(token);
         setEmail(storedEmail);
-        // Removed console.warn statements
+
+        if (token && storedEmail) {
+          console.log("Fetching doctor profile..."); // Debugging log
+          console.log(`API_URL: ${API_URL}, PORT: ${PORT}`);
+
+          // Fetch doctor profile from the backend
+          const response = await fetch(`${API_URL}:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Doctor data received:', data); // Debugging log
+
+            // Since doctor is an array, access the first object
+            setDoctor(data.doctor[0]); // Update to access the first doctor object from the array
+          } else {
+            const errorData = await response.json();
+            console.error('Error fetching profile:', errorData.error); // Debugging log
+            setError(errorData.error || 'Failed to load profile');
+          }
+        } else {
+          console.warn('Token or email not found in AsyncStorage'); // Debugging log
+          setError('Missing access token or email');
+        }
       } catch (error) {
-        console.error('Failed to fetch access token:', error);
+        console.error('Error fetching doctor profile:', error); // Debugging log
+        setError(error.message);
+      } finally {
+        setLoading(false); // Ensure loading is stopped
       }
     };
-    getAccessToken();
+
+    fetchDoctorProfile();
   }, []);
 
   const handleLogout = async () => {
@@ -53,27 +88,36 @@ const Profile = ({ doctor }) => {
     }
   };
 
+  // Conditionally rendering based on loading, error, and fetched data
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
         <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
         <Text style={styles.headerTitle}>Profile</Text>
       </View>
+      
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.profileContainer}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.value}>{doctor?.name}</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" /> // Loading indicator
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text> // Display error if any
+        ) : doctor ? (
+          <View style={styles.profileContainer}>
+            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.value}>{doctor.name || 'N/A'}</Text>
 
-          <Text style={styles.label}>Doctor ID</Text>
-          <Text style={styles.value}>{doctor?.doctor_id}</Text>
+            <Text style={styles.label}>Doctor ID</Text>
+            <Text style={styles.value}>{doctor.doctor_id || 'N/A'}</Text>
 
-          <Text style={styles.label}>Role</Text>
-          <Text style={styles.value}>{doctor?.role}</Text>
+            <Text style={styles.label}>Role</Text>
+            <Text style={styles.value}>{doctor.role || 'N/A'}</Text>
 
-          <Text style={styles.label}>Email</Text>
-<Text style={styles.value}>{email}</Text>
-{/* Displaying stored email */}
-        </View>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>{email}</Text>
+          </View>
+        ) : (
+          <Text style={styles.errorText}>No doctor profile found</Text> // Handle case where doctor is null
+        )}
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.button, styles.passwordButton]}>

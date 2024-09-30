@@ -17,9 +17,9 @@ const loginDoctor = async (req, res) => {
 
     const accessToken = data.session.access_token;
     const userEmail = data.user.email;
-    
+
     console.log('Login successful:', { accessToken, userEmail });
-    
+
     res.status(200).json({
       message: 'Doctor login successful',
       accessToken,
@@ -32,23 +32,45 @@ const loginDoctor = async (req, res) => {
 };
 
 const logoutDoctor = async (req, res) => {
-    console.log('Logout request received');
-    try {
-      const { error } = await supabase.auth.signOut();
-      console.log('Supabase signOut error:', error);
-  
-      if (error) {
-        return res.status(400).json({ error: error.message });
-      }
-  
-      res.status(200).json({
-        message: 'Doctor logged out successfully',
-      });
-    } catch (error) {
-      console.error('Error during logout:', error);
-      res.status(500).json({ error: error.message });
-    }
-  };
-  
+  console.log('Logout request received');
+  try {
+    const { error } = await supabase.auth.signOut();
+    console.log('Supabase signOut error:', error);
 
-export { loginDoctor, logoutDoctor };
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(200).json({
+      message: 'Doctor logged out successfully',
+    });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const getDoctorProfile = async (req, res) => {
+  const { email } = req.query;
+
+  try {
+    const { data, error } = await supabase.rpc('get_doctor_info', { d_email: email });
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    res.status(200).json({
+      message: 'Doctor profile fetched successfully',
+      doctor: data,
+    });
+  } catch (error) {
+    console.error('Server error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export { loginDoctor, logoutDoctor, getDoctorProfile };

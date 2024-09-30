@@ -17,7 +17,7 @@ const work = () => {
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
         <View>
           <Image source={require('../../assets/images/Logo.png')} style={{ width: 70, height: 60, marginTop: 40, marginLeft: 300, marginBottom: 0 }} />
-          <Text style={{ fontSize: 30, alignSelf: 'center', marginTop: 10, color: "white" }}>Appointment</Text>
+          <Text style={{ fontSize: 30, alignSelf: 'center', marginTop: 10, color: "white" }}>Appointments</Text>
         </View>
       </View>
 

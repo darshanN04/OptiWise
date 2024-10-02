@@ -12,7 +12,7 @@ export default function Home() {
     >
       {/* Logo centered above the text */}
       <View style={styles.container}>
-        <Image source={require('../assets/images/Logo.png')} style={styles.logo} />
+        <Image source={require('../assets/images/Logo1.png')} style={styles.logo} />
 
         {/* <Text style={styles.title}>Welcome to</Text> */}
         <Text style={styles.title}>OptiwisE</Text>

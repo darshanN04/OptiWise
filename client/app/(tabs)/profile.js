@@ -64,7 +64,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${API_URL}:${PORT}/v1/doctor/logout`, {
+      const response = await fetch(`http://192.168.31.145:${PORT}/v1/doctor/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -92,7 +92,7 @@ const Profile = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
-        <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
+        <Image source={require('../../assets/images/Logo1.png')} style={styles.logo} />
         <Text style={styles.headerTitle}>Profile</Text>
       </View>
       

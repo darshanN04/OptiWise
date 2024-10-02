@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/home.png",
+    "splash": {
+      "image": "./assets/images/Logo.png",
+      "resizeMode": "contain",
+      "width": 30
+    },
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {

@@ -36,7 +36,7 @@ const Appointment = () => {
 
       const queryString = query.join('&');
 
-      const response = await fetch(`http://192.168.31.145:7002/v1/patients/search?${queryString}`);
+      const response = await fetch(`http://192.168.0.170:7002/v1/patients/search?${queryString}`);
       const data = await response.json();
 
       if (response.ok) {

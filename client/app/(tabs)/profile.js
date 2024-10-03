@@ -64,7 +64,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`http://192.168.31.145:${PORT}/v1/doctor/logout`, {
+      const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

@@ -35,5 +35,39 @@ const clearAppointments = async (req, res) => {
   }
 };
 
+const getAllTokens = async (req, res) => {
+  try {
+      const { data, error } = await supabase.rpc('get_tokens_ordered'); 
 
-export { clearAppointments, createAppointment }
+      if (error) {
+          throw error; 
+      }
+      return res.status(200).json({ tokens: data });
+  } catch (error) {
+      return res.status(500).json({ error: error.message }); 
+  }
+};
+
+const getPatientIdFromToken = async (req, res) => {
+  const { token } = req.query; // Use query instead of params
+
+  try {
+    const { data, error } = await supabase
+      .from('appointment')
+      .select('patient_id')
+      .eq('token', token);
+
+    if (error) {
+      return res.status(400).json({ message: 'Error retrieving patient ID', error });
+    }
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: 'Patient not found for this token' });
+    }
+    res.status(200).json({ patient_id: data[0].patient_id });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+
+export { clearAppointments, createAppointment,getAllTokens,getPatientIdFromToken }

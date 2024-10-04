@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,7 +36,7 @@ export default function Login({ navigation }) {
       setErrorModalVisible(true);
       return;
     }
-
+    
     try {
       const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/login`,{
         method: 'POST',
@@ -50,33 +50,35 @@ export default function Login({ navigation }) {
 
 
       if (response.ok) {
-        console.log('Login successful'); // Debugging log
-        // Store the access token and email
+        console.log('Login successful'); 
         await AsyncStorage.setItem('accessToken', result.accessToken);
         await AsyncStorage.setItem('doctorEmail', result.email);
 
-        setSuccessModalVisible(true); // Show the success modal
+        setSuccessModalVisible(true); 
         setTimeout(() => {
           setSuccessModalVisible(false);
-          router.push('../(tabs)/Registration'); // Redirect after a brief delay
-        }, 2000); // Close the modal after 2 seconds
+          router.push('../(tabs)/Registration');
+        }, 2000); 
       } else {
-        console.log('Login failed:', result.error); // Debugging log
+        console.log('Login failed:', result.error); 
         setErrorMessage(result.error);
-        setErrorModalVisible(true); // Show the error modal
+        setErrorModalVisible(true); 
       }
     } catch (error) {
-      console.log('Error during login:', error.message); // Debugging log
+      console.log('Error during login:', error.message); 
       setErrorMessage(error.message);
-      setErrorModalVisible(true); // Show the error modal
+      setErrorModalVisible(true); 
     }
   };
 
   return (
     <LinearGradient
-      colors={['#BB8CF9', '#58008E']}
-      style={styles.container}
-    >
+    colors={['#FFFFFF', '#7DF9FF']}
+    start={[0.5, 0]}
+    end={[0.5, 1]}
+    locations={[0.268, 1]}
+    style={styles.container}
+  >
       <View style={styles.content}>
         <Text style={styles.welcomeBackText}>Welcome Back</Text>
         <Text style={styles.loginInstructionText}>Please login to your account</Text>
@@ -178,7 +180,7 @@ const styles = StyleSheet.create({
   },
   welcomeBackText: {
     fontSize: 24,
-    color: 'white',
+    color: 'black',
     textAlign: 'center',
     marginBottom: 10,
     fontFamily: 'Roboto', 
@@ -186,14 +188,14 @@ const styles = StyleSheet.create({
   },
   loginInstructionText: {
     fontSize: 16,
-    color: 'white',
+    color: 'black',
     textAlign: 'center',
     marginBottom: 20,
     fontFamily: 'Roboto',
   },
   label: {
     alignSelf: 'flex-start',
-    color: 'white',
+    color: 'black',
     marginBottom: 5,
     marginLeft: '10%',
     fontFamily: 'Roboto',

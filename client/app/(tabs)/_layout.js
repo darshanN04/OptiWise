@@ -29,7 +29,7 @@ export default function workLayout() {
                       headerShown: false,  
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
-                      name="Registration"
+                      name=""
                       icon={icons.home}
                       color={color}
                       focused={focused}/> 
@@ -40,7 +40,7 @@ export default function workLayout() {
                       headerShown: false,  
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
-                      name="Appointment"
+                      name=""
                       icon={icons.appointment}
                       color={color}
                       focused={focused}/> 
@@ -51,7 +51,7 @@ export default function workLayout() {
                       headerShown: false,  
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
-                      name="Profile"
+                      name=""
                       icon={icons.profile}
                       color={color}
                       focused={focused}/> 
@@ -62,13 +62,24 @@ export default function workLayout() {
                       headerShown: false,  
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
-                      name="Prescription"
+                      name=""
                       icon={icons.prescription}
+                      color={color}
+                      focused={focused}/> 
+                      )}} />
+        <Tabs.Screen name="Appointment Dashboard"
+                     options={{
+                      title:"Appointment Dashboard",
+                      headerShown: false,  
+                      tabBarIcon: ({color, focused})=>(
+                      <TabIcon 
+                      name=""
+                      icon={icons.eye}
                       color={color}
                       focused={focused}/> 
                       )}} />
 
       </Tabs>
-    </>
+    </> 
   );
 }

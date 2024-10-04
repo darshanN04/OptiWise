@@ -12,11 +12,13 @@ const Appointment = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [tokenModalVisible, setTokenModalVisible] = useState(false); // New state for token modal
   const [searchDetails, setSearchDetails] = useState({
     patientName: '',
     patientPhone: '',
   });
   const [patientResults, setPatientResults] = useState([]);
+  const [token, setToken] = useState(''); // State to hold the token
 
   const handleSearchSubmit = async () => {
     try {
@@ -45,14 +47,48 @@ const Appointment = () => {
         setResultModalVisible(true);
       } else if (response.status === 404) {
         setResultModalVisible(true);  
-        setPatientResults([]);  }
+        setPatientResults([]);  
+      }
     } catch (error) {
       console.error('Error occurred:', error);
     }
-    
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    const { e_num, e_reason } = entryDetails;
+
+    if (!e_num || !e_reason) {
+      setToken('Please enter both Patient ID and Reason for Visit.'); // Show message in token modal
+      setTokenModalVisible(true);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://192.168.0.170:7002/v1/appointments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: parseInt(e_num), // Ensure patient_id is an integer
+          reason: e_reason,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setToken(data.token); // Set the token state
+        setEntryDetails({ e_num: '', e_reason: '' });
+        setTokenModalVisible(true); // Show the token modal
+      } else {
+        setToken(data.message || 'Unknown error occurred');
+        setTokenModalVisible(true); // Show error message in the token modal
+      }
+    } catch (error) {
+      console.error('Error occurred while creating appointment:', error);
+    }
+  };
 
   const copyToClipboard = (patientId) => {
     Clipboard.setString(patientId.toString());
@@ -174,6 +210,24 @@ const Appointment = () => {
           </View>
         </View>
       </Modal>
+
+      {/* New Modal for displaying token */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={tokenModalVisible}
+        onRequestClose={() => setTokenModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Token Information</Text>
+            <Text style={styles.resultText}>{token}</Text>
+            <Pressable style={styles.modalCloseButton} onPress={() => setTokenModalVisible(false)}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -197,129 +251,123 @@ const styles = StyleSheet.create({
   logo: {
     width: 70,
     height: 60,
-    marginBottom: 10,
+    position: 'absolute',
+    top: 50,
+    left: 20,
   },
   headerText: {
-    fontSize: 30,
-    color: "white",
-    textAlign: 'center',
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold',
   },
   scrollViewContent: {
-    flexGrow: 1,
-    paddingTop: 200,
-    padding: 20,
+    paddingTop: 150,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   formContainer: {
-    flex: 1,
-    paddingTop: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+    marginTop:90,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
-  },
-  inputField: {
-    flex: 1,
-    padding: 0,
-    color: 'black',
+    fontWeight: 'bold',
   },
   patientInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#ddd',
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 2,
+  },
+  inputField: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginRight: 10,
+  },
+  searchButton: {
+    backgroundColor: '#FF4545',
+    borderRadius: 5,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchIcon: {
+    alignSelf: 'center',
   },
   reasonInput: {
     height: 100,
-    textAlignVertical: 'top',
-    borderColor: '#ddd',
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 10,
   },
   submitButton: {
-    backgroundColor: "#007BFF",
-    width: 110,
-    height: 43,
+    backgroundColor: '#007bff',
     borderRadius: 20,
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 15,
+    alignItems: 'center',
   },
   submitButtonText: {
-    color: "white",
-    fontSize: 19,
-  },
-  searchButton: {
-    backgroundColor: "#007BFF",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 10,
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "white",
-    borderRadius: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
     padding: 20,
-    alignItems: "center",
-    width: '90%',
+    width: '80%',
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
-    marginBottom: 15,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#ddd',
-    borderWidth: 2,
-    borderRadius: 10,
-    padding: 2,
-    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 10,
   },
   inputIcon: {
-    marginHorizontal: 10,
+    padding: 10,
   },
   modalSubmitButton: {
-    backgroundColor: "#007BFF",
-    borderRadius: 20,
+    backgroundColor: '#FF4545',
+    borderRadius: 5,
     padding: 10,
-    width: 100,
-    alignItems: "center",
+    alignItems: 'center',
+    marginBottom: 10,
   },
   modalSubmitButtonText: {
-    color: "white",
-    fontSize: 16,
+    color: 'white',
   },
   modalCloseButton: {
-    marginTop: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    alignItems: 'center',
   },
   modalCloseButtonText: {
-    fontSize: 16,
-    color: 'blue',
+    color: 'black',
   },
   resultsContainer: {
-    maxHeight: 400,
-    width: '100%',
-    marginVertical: 10,
+    maxHeight: 300,
   },
   patientResult: {
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    paddingBottom: 10,
+    marginBottom: 15,
   },
   resultText: {
     fontSize: 16,

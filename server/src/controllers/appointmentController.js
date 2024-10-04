@@ -1,39 +1,25 @@
 import { supabase } from '../db/supabaseClient.js';
 
 const createAppointment = async (req, res) => {
-  const { patient_id, reason } = req.body;
-  try {
-    const { data: latestTokenData, error: fetchError } = await supabase
-      .from('appointment')
-      .select('token')
-      .order('token', { ascending: false })
-      .limit(1);
-    if (fetchError) {
-      return res.status(500).json({ error: fetchError.message });
-    }
-    const nextToken = latestTokenData && latestTokenData.length > 0 ? latestTokenData[0].token + 1 : 1;
-    const { data, error } = await supabase
-      .from('appointment')
-      .insert([{
-        patient_id,
-        reason,
-        created_at: new Date().toISOString(),
-        token: nextToken
-      }])
-      .select();
+    try {
+        const { patient_id, reason } = req.body;
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
+        if (!patient_id || !reason) {
+            return res.status(400).json({ error: 'Patient ID and reason are required.' });
+        }
+        const { data, error } = await supabase.rpc('create_appointment', {
+            p_id: patient_id,
+            p_reason: reason,
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        return res.status(200).json({ token: data });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
     }
-    res.status(201).json({
-      appointment: {
-        TOKEN_NO: nextToken,
-        reason: reason
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 };
 
 

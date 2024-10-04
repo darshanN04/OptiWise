@@ -34,6 +34,7 @@ export default function Login({ navigation }) {
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setErrorModalVisible(true);
+      router.push('../(tabs)/Registration');
       return;
     }
     

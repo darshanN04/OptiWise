@@ -28,7 +28,7 @@ const Profile = () => {
           console.log(`API_URL: ${API_URL}, PORT: ${PORT}`);
 
           // Fetch doctor profile from the backend
-          const response = await fetch(`${API_URL}:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
+          const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,

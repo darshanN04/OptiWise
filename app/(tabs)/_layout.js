@@ -67,8 +67,19 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} />
+          <Tabs.Screen name="Appointment Dashboard"
+                     options={{
+                      title:"Appointment Dashboard",
+                      headerShown: false,  
+                      tabBarIcon: ({color, focused})=>(
+                      <TabIcon 
+                      name="Appointment Dashboard"
+                      icon={icons.eye}
+                      color={color}
+                      focused={focused}/> 
+                      )}} />
 
       </Tabs>
-    </>
+    </> 
   );
 }

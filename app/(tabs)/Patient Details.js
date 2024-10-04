@@ -7,11 +7,11 @@ import "../../assets/images/Logo.png";
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
-const AppointmentDashboard = () => {
+const PatientDetails = () => {
   return (
     <View style={{ flex: 1 }}>
 
-<View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
+    <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
         <Link href="../(profile)/profile" style={{height: 100, left: width*0.05, top: 25}}>
           <Image 
             source={require('../../assets/images/Logo.png')} 
@@ -19,7 +19,7 @@ const AppointmentDashboard = () => {
           />
         </Link>
         <View style={{ flex: 1}}>
-          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Appointment Dashboard</Text>
+          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Patient Details</Text>
         </View>
       </View>
 
@@ -30,6 +30,6 @@ const AppointmentDashboard = () => {
   )
 }
 
-export default AppointmentDashboard
+export default PatientDetails
 
 const styles = StyleSheet.create({})

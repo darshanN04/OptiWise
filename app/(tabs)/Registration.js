@@ -41,9 +41,14 @@ const patientReg = () => {
     <View style={{ flex: 1 }}>
 
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <View style={{width: width}}>
-          <Image source={require('../../assets/images/Logo.png')} style={{ width: 70, height: 60, marginTop: 40, marginLeft: 300, marginBottom: 0 }} />
-          <Text style={{ fontSize: 30, alignSelf: 'center', marginTop: 10, color: "white" }}>Patient Registration</Text>
+        <Link href="../(profile)/profile" style={{height: 100, left: width*0.05, top: 25}}>
+          <Image 
+            source={require('../../assets/images/Logo.png')} 
+            style={{ width: 60, height: 50 }} 
+          />
+        </Link>
+        <View style={{ flex: 1}}>
+          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Patient Registration</Text>
         </View>
       </View>
 

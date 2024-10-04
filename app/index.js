@@ -2,6 +2,7 @@ import { Link } from 'expo-router';
 import { View, Text, Button, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import "../assets/images/Logo.png";
+
 export default function Home() {
   return (
     <LinearGradient

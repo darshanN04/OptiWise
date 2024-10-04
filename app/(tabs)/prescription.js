@@ -1,17 +1,20 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import cal from "../../assets/icons/calender.png";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
+import { BlurView } from 'expo-blur';
+
 
 
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
 const Prescription = () => {
+
   const [prescription, setPrescription] = useState({
     pres_date: "",
     pres_patientno: "",
@@ -83,9 +86,14 @@ const Prescription = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <View>
-          <Image source={require('../../assets/images/Logo.png')} style={{ width: 70, height: 60, marginTop: 40, marginLeft: 300, marginBottom: 0 }} />
-          <Text style={{ fontSize: 30, alignSelf: 'center', marginTop: 10, color: "white" }}>Prescription</Text>
+        <Link href="../(profile)/profile" style={{height: 100, left: width*0.05, top: 25}}>
+          <Image 
+            source={require('../../assets/images/Logo.png')} 
+            style={{ width: 60, height: 50 }} 
+          />
+        </Link>
+        <View style={{ flex: 1}}>
+          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Prescription</Text>
         </View>
       </View>
 
@@ -150,65 +158,66 @@ const Prescription = () => {
           </View>
 
           
+          <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
 
           {/* -----------------------Visual Acuity Table----------------------- */}
-
+          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
+            <View>
           {/* Right EYE */}
-          <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
-              <View>
-                <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
-                <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Right :</Text>
-              </View>
-              <ScrollView horizontal={true} style={{ flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
-                <View style={{ borderWidth: 1, borderColor: 'black' }}>
-
-                  {/* Table Header */}
-                  <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                    <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
-                    <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
-                      <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Right</Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
-                        <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
-                      </View>
-                    </View>
+              <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
+                  <View>
+                    <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Right :</Text>
                   </View>
+                  <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
+                    <View style={{ borderWidth: 1, borderColor: 'black' }}>
 
-                  {/* Table Rows */}
-                  {data.map((item) => (
-                    <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                      <Text style={{ padding: 0, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
+                      {/* Table Header */}
+                      <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                        <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
+                        <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
+                          <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Right</Text>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
+                            <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
+                          </View>
+                        </View>
+                      </View>
 
-                      {/* Right Eye Pickers */}
-                      <Picker
-                        selectedValue={selectedRightDV[item.id] || visualOptions[0]}
-                        style={{ height: 50, width: 120 }}
-                        onValueChange={(value) => handlePickerChange('right', 'DV', value, item.id)}
-                      >
-                        {visualOptions.map((option, index) => (
-                          <Picker.Item key={index} label={option} value={option} />
-                        ))}
-                      </Picker>
+                      {/* Table Rows */}
+                      {data.map((item) => (
+                        <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                          <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
 
-                      <Picker
-                        selectedValue={selectedRightNV[item.id] || visualOptions[0]}
-                        style={{ height: 50, width: 120 }}
-                        onValueChange={(value) => handlePickerChange('right', 'NV', value, item.id)}
-                      >
-                        {visualOptions.map((option, index) => (
-                          <Picker.Item key={index} label={option} value={option} />
-                        ))}
-                      </Picker>                  
+                          {/* Right Eye Pickers */}
+                          <Picker
+                            selectedValue={selectedRightDV[item.id] || visualOptions[0]}
+                            style={{ height: 50, width: 120, alignSelf: 'center',flex: 1, justifyContent:'center' }}
+                            onValueChange={(value) => handlePickerChange('right', 'DV', value, item.id)}
+                          >
+                            {visualOptions.map((option, index) => (
+                              <Picker.Item key={index} label={option} value={option} />
+                            ))}
+                          </Picker>
+
+                          <Picker
+                            selectedValue={selectedRightNV[item.id] || visualOptions[0]}
+                            style={{ height: 50, width: 120, alignSelf: 'center' }}
+                            onValueChange={(value) => handlePickerChange('right', 'NV', value, item.id)}
+                          >
+                            {visualOptions.map((option, index) => (
+                              <Picker.Item key={index} label={option} value={option} />
+                            ))}
+                          </Picker>                  
+                        </View>
+                      ))}
                     </View>
-                  ))}
-                </View>
-              </ScrollView>
+                  </ScrollView>
                 
               {/* -----------------------Range Slider----------------------- */}
               
                 {/* DV */}
                   {/* Right Eye Sphere */}
-                    
+                  
                     <View>
                       <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
                       <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
@@ -310,65 +319,65 @@ const Prescription = () => {
                         thumbTintColor="#F52D2D"
                       />
                     </View>
+            </View>
           </View>
-
 
           {/* ___LEFT EYE____ */}
-
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
           <View>
-            <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Left :</Text>
-          </View>
-          <ScrollView horizontal={true} style={{ flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
-            <View style={{ borderWidth: 1, borderColor: 'black' }}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
+            <View>
+            <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Left :</Text>
+            </View>
+            <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
+              <View style={{ borderWidth: 1, borderColor: 'black' }}>
 
               {/* Table Header */}
-              <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
-                <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
-                  <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Left</Text>
-                  <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
-                    <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
+                <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
+                  <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
+                    <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Left</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
+                      <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
 
               {/* Table Rows */}
-              {data.map((item) => (
-                <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                  <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 10, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
+                {data.map((item) => (
+                  <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                    <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
 
-                  {/* Right Eye Pickers */}
-                  <Picker
-                    selectedValue={selectedLeftDV[item.id] || visualOptions[0]}
-                    style={{ height: 50, width: 120 }}
-                    onValueChange={(value) => handlePickerChange('left', 'DV', value, item.id)}
-                  >
-                    {visualOptions.map((option, index) => (
-                      <Picker.Item key={index} label={option} value={option} />
-                    ))}
-                  </Picker>
+                    {/* Right Eye Pickers */}
+                    <Picker
+                      selectedValue={selectedLeftDV[item.id] || visualOptions[0]}
+                      style={{ height: 50, width: 120, alignSelf: 'center' }}
+                      onValueChange={(value) => handlePickerChange('left', 'DV', value, item.id)}
+                    >
+                      {visualOptions.map((option, index) => (
+                        <Picker.Item key={index} label={option} value={option} />
+                      ))}
+                    </Picker>
 
-                  <Picker
-                    selectedValue={selectedLeftNV[item.id] || visualOptions[0]}
-                    style={{ height: 50, width: 120 }}
-                    onValueChange={(value) => handlePickerChange('left', 'NV', value, item.id)}
-                  >
-                    {visualOptions.map((option, index) => (
-                      <Picker.Item key={index} label={option} value={option} />
-                    ))}
-                  </Picker>                  
-                </View>
-              ))}
-            </View>
-          </ScrollView>
+                    <Picker
+                      selectedValue={selectedLeftNV[item.id] || visualOptions[0]}
+                      style={{ height: 50, width: 120, alignSelf: 'center' }}
+                      onValueChange={(value) => handlePickerChange('left', 'NV', value, item.id)}
+                    >
+                      {visualOptions.map((option, index) => (
+                        <Picker.Item key={index} label={option} value={option} />
+                      ))}
+                    </Picker>                  
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
             
           {/* -----------------------Range Slider----------------------- */}
           
             {/* DV */}
               {/* Left Eye Sphere */}
-                
+               
                 <View>
                   <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
                   <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
@@ -471,6 +480,8 @@ const Prescription = () => {
                   />
                 </View>
           </View>
+        </View>
+      </ScrollView>
 
           {/* -----------------------OTHER DETAILS----------------------- */}
 
@@ -594,7 +605,8 @@ const styles = StyleSheet.create({
   rangeSlider: {
     width: 350,
     height: 10,
-    marginBottom: 15
+    marginBottom: 15,
+    elevation: 20
   },
   buttonContainer: {
     flexDirection: 'row',

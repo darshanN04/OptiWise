@@ -4,7 +4,7 @@
     "slug": "OptiWise",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icons/home.png",
+    "icon": "./assets/",
     "splash": {
       "image": "./assets/images/Logo.png",
       "resizeMode": "contain",

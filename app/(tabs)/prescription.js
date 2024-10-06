@@ -83,6 +83,8 @@ const Prescription = () => {
   const [checked10, setChecked10] = useState(false);
   const [checked11, setChecked11] = useState(false);
 
+  const [isSliderActive, setIsSliderActive] = useState(false);
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
@@ -161,7 +163,8 @@ const Prescription = () => {
           <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
 
           {/* -----------------------Visual Acuity Table----------------------- */}
-          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
+          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}} scrollEnabled={!isSliderActive} // Disable scrolling when interacting with sliders
+          >
             <View>
           {/* Right EYE */}
               <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
@@ -234,11 +237,13 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"  // Color for the left side of the slider
                         maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
                         thumbTintColor="#358D9C"         // Color of the slider thumb
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)} 
                       />
                     </View>
                     
                   {/* Right Eye Cylinder */}
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
                       <Text style={styles.valueText}>Cylinder Value: {dvrightCylinder.toFixed(2)}</Text>
                       <Slider
                         style={styles.rangeSlider}
@@ -250,6 +255,8 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)} 
                       />
                     </View>
                       
@@ -266,6 +273,8 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
                       />
                     </View>
                 {/* NV */}
@@ -285,6 +294,8 @@ const Prescription = () => {
                           minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                           maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                           thumbTintColor="#F52D2D"         // Color of the slider thumb
+                          onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                          onTouchEnd={() => setIsSliderActive(false)}
                         />
                       </View>
                     
@@ -301,6 +312,8 @@ const Prescription = () => {
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
                       />
                     </View>
                       
@@ -317,6 +330,8 @@ const Prescription = () => {
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
                       />
                     </View>
             </View>
@@ -394,6 +409,8 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"  // Color for the left side of the slider
                     maximumTrackTintColor="#D3D3D3"  // Color for the right side of the slider
                     thumbTintColor="#1E90FF"         // Color of the slider thumb
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
                   />
                 </View>
                 
@@ -410,6 +427,8 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
                   />
                 </View>
                   
@@ -426,6 +445,8 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
                   />
                 </View>
             {/* NV */}
@@ -445,6 +466,8 @@ const Prescription = () => {
                       minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                       maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                       thumbTintColor="#F52D2D"         // Color of the slider thumb
+                      onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                      onTouchEnd={() => setIsSliderActive(false)}
                     />
                   </View>
                 
@@ -461,6 +484,8 @@ const Prescription = () => {
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
                   />
                 </View>
                   
@@ -477,6 +502,8 @@ const Prescription = () => {
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
                   />
                 </View>
           </View>
@@ -604,9 +631,8 @@ const styles = StyleSheet.create({
   },
   rangeSlider: {
     width: 350,
-    height: 10,
-    marginBottom: 15,
-    elevation: 20
+    height: 20,
+    marginBottom: 10
   },
   buttonContainer: {
     flexDirection: 'row',

@@ -19,7 +19,6 @@ export default function Home() {
           <Link href="./(auth)/login" style={styles.button}>
             <Text>Login</Text>
           </Link>
-          
         </View>
       </View>
     </LinearGradient>

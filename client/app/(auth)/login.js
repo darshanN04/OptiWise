@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL, PORT } from '@env';
 
-
 SplashScreen.preventAutoHideAsync();
 
 export default function Login({ navigation }) { 
@@ -28,13 +27,21 @@ export default function Login({ navigation }) {
     hideSplash();
   }, []);
 
+  // Clear state function
+  const clearState = () => {
+    setForm({ email: "", password: "" });
+    setShowPassword(false);
+    setSuccessModalVisible(false);
+    setErrorModalVisible(false);
+    setErrorMessage("");
+  };
+
   const logIn = async (email, password) => {
     console.log('logIn function called with:', email, password); // Debugging log
 
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setErrorModalVisible(true);
-      router.push('../(tabs)/Registration');
       return;
     }
     
@@ -49,7 +56,6 @@ export default function Login({ navigation }) {
 
       const result = await response.json();
 
-
       if (response.ok) {
         console.log('Login successful'); 
         await AsyncStorage.setItem('accessToken', result.accessToken);
@@ -58,6 +64,7 @@ export default function Login({ navigation }) {
         setSuccessModalVisible(true); 
         setTimeout(() => {
           setSuccessModalVisible(false);
+          clearState(); // Clear form state after login
           router.push('../(tabs)/Registration');
         }, 2000); 
       } else {
@@ -74,12 +81,12 @@ export default function Login({ navigation }) {
 
   return (
     <LinearGradient
-    colors={['#FFFFFF', '#7DF9FF']}
-    start={[0.5, 0]}
-    end={[0.5, 1]}
-    locations={[0.268, 1]}
-    style={styles.container}
-  >
+      colors={['#FFFFFF', '#7DF9FF']}
+      start={[0.5, 0]}
+      end={[0.5, 1]}
+      locations={[0.268, 1]}
+      style={styles.container}
+    >
       <View style={styles.content}>
         <Text style={styles.welcomeBackText}>Welcome Back</Text>
         <Text style={styles.loginInstructionText}>Please login to your account</Text>

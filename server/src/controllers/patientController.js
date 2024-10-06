@@ -98,6 +98,34 @@ const registerPatient = async (req, res) => {
     }
   };
 
+  const getPatientWithDetails = async (req, res) => {
+    const { patientId } = req.params; // Get patientId from route parameters
+
+    // Query the Supabase database for the patient and additional details
+    const { data, error } = await supabase
+        .from('patient') // Main table
+        .select(`
+            *,
+            additional_details (
+                email,
+                medical_history,
+                current_medication,
+                allergies,
+                emergency_name,
+                emergency_phone,
+                emergency_relation,
+                next_appointment
+            )
+        `) // Select fields from additional_details
+        .eq('patient_id', patientId) // Filter by patient ID
+        .single(); // Expect a single record
 
 
-export { getAllPatientDetails, searchPatientByNameAndPhone ,registerPatient}
+    if (!data) {
+        return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    return res.status(200).json(data); // Respond with patient details and additional details
+};
+
+export { getAllPatientDetails, searchPatientByNameAndPhone ,registerPatient,getPatientWithDetails}

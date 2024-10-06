@@ -26,7 +26,7 @@ const AppointmentDashboard = () => {
   }, []);
 
   const handleTokenPress = (token) => {
-    navigation.navigate('prescription', { token });
+    navigation.navigate('../Home', { token });
   };
 
   return (

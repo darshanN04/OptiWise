@@ -45,7 +45,7 @@ export default function workLayout() {
                       focused={focused}/> 
                       )}} />
           
-          <Tabs.Screen name="prescription"
+          {/* <Tabs.Screen name="prescription"
                      options={{
                       title:"prescription",
                       headerShown: false,  
@@ -55,7 +55,7 @@ export default function workLayout() {
                       icon={icons.prescription}
                       color={color}
                       focused={focused}/> 
-                      )}} />
+                      )}} /> */}
           <Tabs.Screen name="Appointment Dashboard"
                      options={{
                       title:"Appointment Dashboard",

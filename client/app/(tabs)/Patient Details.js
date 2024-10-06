@@ -1,14 +1,27 @@
-import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, TouchableOpacity, Modal, Pressable, FlatList } from 'react-native';
-import React, { useState } from 'react';
-import { Link } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  FlatList,
+  Clipboard,
+} from "react-native";
+import React, { useState } from "react";
+import { Link } from "expo-router";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const PatientDetails = () => {
   const [searchDetails, setSearchDetails] = useState({
-    patientName: '',
-    patientPhone: '',
+    patientName: "",
+    patientPhone: "",
   });
   const [patientResults, setPatientResults] = useState([]);
   const [resultModalVisible, setResultModalVisible] = useState(false);
@@ -16,44 +29,56 @@ const PatientDetails = () => {
   const handleSearchSubmit = async () => {
     try {
       const { patientName, patientPhone } = searchDetails;
-  
+
       if (!patientName && !patientPhone) {
         return;
       }
-  
-      let query = [];
+
+      const query = [];
       if (patientName) {
-        query.push(`name=${patientName}`);
+        query.push(`name=${encodeURIComponent(patientName)}`);
       }
       if (patientPhone) {
-        query.push(`phone_no=${patientPhone}`);
+        query.push(`phone_no=${encodeURIComponent(patientPhone)}`);
       }
-  
-      const queryString = query.join('&');
-  
-      const response = await fetch(`http://192.168.31.145:7002/v1/patients/search?${queryString}`);
+
+      const queryString = query.join("&");
+      const response = await fetch(
+        `http://192.168.31.145:7002/v1/patients/search?${queryString}`
+      );
       const data = await response.json();
-  
+
       if (response.ok) {
-        if (data.length > 0) {
-          setPatientResults(data);  // Patients found
-        } else {
-          setPatientResults(null);  // No patients found
-        }
-        setResultModalVisible(true);
+        setPatientResults(data.length > 0 ? data : []);
       } else {
-        setPatientResults(null); // Ensure no patients found logic is triggered
-        setResultModalVisible(true);
+        setPatientResults([]);
       }
+      setResultModalVisible(true);
     } catch (error) {
-      console.error('Error occurred:', error);
+      console.error("Error occurred:", error);
     }
   };
-  
+
+  const handlePatientSelect = async (patientId) => {
+    await Clipboard.setString(patientId.toString());
+    handleClearSearch();
+  };
+
+  const handleClearSearch = () => {
+    setSearchDetails({ patientName: "", patientPhone: "" });
+    setPatientResults([]); // Clear patient results
+    setResultModalVisible(false); // Close the modal
+  };
 
   const renderPatient = ({ item }) => (
     <View key={item.patient_id} style={styles.patientResult}>
-      <Text style={styles.resultText}>Patient ID: {item.patient_id}</Text>
+      <Link
+        href={`../(patientdetails)/patientform?patientId=${item.patient_id}`}
+        style={styles.linkText} // Added styling for the link
+        onPress={() => handlePatientSelect(item.patient_id)}
+      >
+        <Text style={styles.resultText}>Patient ID: {item.patient_id}</Text>
+      </Link>
       <Text style={styles.resultText}>Name: {item.name}</Text>
       <Text style={styles.resultText}>DOB: {item.dob}</Text>
       <Text style={styles.resultText}>Gender: {item.gender}</Text>
@@ -63,90 +88,109 @@ const PatientDetails = () => {
       <Text style={styles.resultText}>Address: {item.address}</Text>
     </View>
   );
-
+  
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <Link href="../(profile)/profile" style={{ height: 100, left: width * 0.05, top: 25 }}>
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
           <Image
-            source={require('../../assets/images/Logo.png')}
-            style={{ width: 60, height: 50 }}
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
           />
         </Link>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Patient Details</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Patient Details</Text>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 220 }}>
+        <View style={styles.searchContainer}>
           <Text style={styles.label}>Search Patient</Text>
 
           <View style={styles.inputContainer}>
-            <Icon name="user" size={20} color="black" style={styles.inputIcon} />
+            <Icon
+              name="user"
+              size={20}
+              color="black"
+              style={styles.inputIcon}
+            />
             <TextInput
               style={styles.inputField}
               placeholder="Patient Name"
               value={searchDetails.patientName}
-              onChangeText={(text) => setSearchDetails({ ...searchDetails, patientName: text })}
+              onChangeText={(text) =>
+                setSearchDetails({ ...searchDetails, patientName: text })
+              }
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="phone" size={20} color="black" style={styles.inputIcon} />
+            <Icon
+              name="phone"
+              size={20}
+              color="black"
+              style={styles.inputIcon}
+            />
             <TextInput
               style={styles.inputField}
               placeholder="Patient Phone No."
               value={searchDetails.patientPhone}
-              onChangeText={(text) => setSearchDetails({ ...searchDetails, patientPhone: text })}
+              onChangeText={(text) =>
+                setSearchDetails({ ...searchDetails, patientPhone: text })
+              }
               keyboardType="phone-pad"
             />
           </View>
 
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearchSubmit}>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleSearchSubmit}
+          >
             <Text style={styles.searchButtonText}>Search</Text>
           </TouchableOpacity>
 
-          <Link href="" style={styles.button}>
-            <Text>Go back</Text>
-          </Link>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleClearSearch}
+          >
+            <Text style={styles.searchButtonText}>Reset</Text>
+          </TouchableOpacity>
 
           {/* Result Modal */}
-{/* Result Modal */}
-<Modal
-  animationType="slide"
-  transparent={true}
-  visible={resultModalVisible}
-  onRequestClose={() => setResultModalVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Patient Search Results</Text>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={resultModalVisible}
+            onRequestClose={handleClearSearch}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Patient Search Results</Text>
 
-      {patientResults === null ? (
-        // Display this if no patients found
-        <View>
-          <Text style={styles.noPatientText}>No patient found</Text>
-        </View>
-      ) : (
-        // Display the list of patients if found
-        <FlatList
-          data={patientResults}
-          renderItem={renderPatient}
-          keyExtractor={(item) => item.patient_id.toString()}
-          style={styles.resultsContainer}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+                {patientResults.length === 0 ? (
+                  <View>
+                    <Text style={styles.noPatientText}>No patient found</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    data={patientResults}
+                    renderItem={renderPatient}
+                    keyExtractor={(item) => item.patient_id.toString()}
+                    style={styles.resultsContainer}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    showsVerticalScrollIndicator={false}
+                  />
+                )}
 
-      <Pressable style={styles.modalCloseButton} onPress={() => setResultModalVisible(false)}>
-        <Text style={styles.modalCloseButtonText}>Close</Text>
-      </Pressable>
-    </View>
-  </View>
-</Modal>
-
+                <Pressable
+                  style={styles.modalCloseButton}
+                  onPress={handleClearSearch}
+                >
+                  <Text style={styles.modalCloseButtonText}>Close</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
     </View>
@@ -156,11 +200,46 @@ const PatientDetails = () => {
 export default PatientDetails;
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    height: 200,
+    backgroundColor: "#FF4545",
+    width: width,
+    position: "absolute",
+    zIndex: 10,
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
+  },
+  logo: {
+    width: 60,
+    height: 50,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  headerText: {
+    fontSize: 30,
+    color: "white",
+    alignSelf: "center",
+  },
+  searchContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 220,
+  },
+  label: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
-    width: '80%',
+    width: "80%",
   },
   inputIcon: {
     marginRight: 10,
@@ -168,77 +247,66 @@ const styles = StyleSheet.create({
   inputField: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 5,
     padding: 10,
   },
   searchButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
   },
   searchButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
-  },
-  label: {
-    fontSize: 20,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    color: 'white',
-    textAlign: 'center',
-    borderRadius: 5,
-    marginTop: 20,
-    fontSize: 15,
-    width: 100,
+    color: "white",
+    textAlign: "center",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
+    width: "80%",
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
+    padding: 20,
   },
   modalTitle: {
     fontSize: 20,
-    marginBottom: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
   },
   resultsContainer: {
-    width: '100%',
-    maxHeight: 440, // Ensure to fit only three records
+    maxHeight: 300,
   },
   patientResult: {
-    marginBottom: 10,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   resultText: {
     fontSize: 16,
   },
-  noPatientText: {
-    fontSize: 18,
-    color: 'red',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   modalCloseButton: {
-    marginTop: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: "#FF4545",
     padding: 10,
     borderRadius: 5,
+    marginTop: 20,
   },
   modalCloseButtonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: "white",
+    textAlign: "center",
+  },
+  noPatientText: {
+    textAlign: "center",
+    marginTop: 20,
+  },
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    marginTop: 10,
   },
 });

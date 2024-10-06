@@ -6,7 +6,6 @@ import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
-import { BlurView } from 'expo-blur';
 
 
 
@@ -31,18 +30,16 @@ const Prescription = () => {
     { id: 3, visualAcuity: 'Corrected Visual Acuity (With new correction)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
   ];
   const visualOptions = ['NA', '6/5', '6/6', '6/12', '6/24', '6/36', '6/48', '6/60', '3/60', '2/60', '1/60', 'HM', 'PL', 'NPL'];
-  const handlePickerChange = (side, type, value, id) => {
-    switch (side) {
-      case 'right':
-        if (type === 'DV') setSelectedRightDV({ ...selectedRightDV, [id]: value });
-        else setSelectedRightNV({ ...selectedRightNV, [id]: value });
-        break;
-      case 'left':
-        if (type === 'DV') setSelectedLeftDV({ ...selectedLeftDV, [id]: value });
-        else setSelectedLeftNV({ ...selectedLeftNV, [id]: value });
-        break;
+  const sliderValueChange = (side, type, value) => {
+    if (side === 'right') {
+      if (type === 'sphere') setDVRightSphere(value);
+      else if (type === 'cylinder') setDVRightCylinder(value);
+    } else if (side === 'left') {
+      if (type === 'sphere') setDVLeftSphere(value);
+      else if (type === 'cylinder') setDVLeftCylinder(value);
     }
   };
+  
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);

@@ -6,8 +6,7 @@ import {icons} from "../../constants"
 const TabIcon = ({icon, color, name, focused})=>{
   return (
     <View style={{alignItems: 'center', justifyContent: 'center', gap: 2}}>
-      <Image source={icon} resizeMode='contain' style={{ width:focused? 25:20, height:focused? 25:20, marginTop: 0}}/> 
-      <Text style={{fontWeight: focused ? 900 : 200, color: 'white', fontSize: focused? 16:12}}>{name}</Text>
+      <Image source={icon} resizeMode='contain' style={{ width:focused? 35:25, height:focused? 35:25, marginTop: 0}}/> 
     </View>
   )
 }
@@ -30,7 +29,7 @@ export default function workLayout() {
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
                       name=""
-                      icon={icons.home}
+                      icon={icons.rightArrow}
                       color={color}
                       focused={focused}/> 
                       )}} />
@@ -45,17 +44,7 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} />
-          <Tabs.Screen name="profile"
-                     options={{
-                      title:"profile",
-                      headerShown: false,  
-                      tabBarIcon: ({color, focused})=>(
-                      <TabIcon 
-                      name=""
-                      icon={icons.profile}
-                      color={color}
-                      focused={focused}/> 
-                      )}} />
+          
           <Tabs.Screen name="prescription"
                      options={{
                       title:"prescription",
@@ -67,9 +56,20 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} />
-        <Tabs.Screen name="Appointment Dashboard"
+          <Tabs.Screen name="Appointment Dashboard"
                      options={{
                       title:"Appointment Dashboard",
+                      headerShown: false,  
+                      tabBarIcon: ({color, focused})=>(
+                      <TabIcon 
+                      name=""
+                      icon={icons.leftArrow}
+                      color={color}
+                      focused={focused}/> 
+                      )}} />
+          <Tabs.Screen name="Patient Details"
+                     options={{
+                      title:"Patient Details",
                       headerShown: false,  
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
@@ -78,7 +78,6 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} />
-
       </Tabs>
     </> 
   );

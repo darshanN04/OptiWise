@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'; 
+import { Link } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -10,7 +11,7 @@ const AppointmentDashboard = () => {
 
   const fetchTokens = async () => {
     try {
-      const response = await fetch('http://192.168.0.170:7002/v1/appointments/tokens');
+      const response = await fetch('http://192.168.31.145:7002/v1/appointments/tokens');
       const data = await response.json();
       setTokens(data.tokens); 
     } catch (error) {
@@ -31,7 +32,7 @@ const AppointmentDashboard = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
-        <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
+        <Image source={require('../../assets/images/Logo1.png')} style={styles.logo} />
         <Text style={styles.headerText}>Appointment Dashboard</Text>
       </View>
 

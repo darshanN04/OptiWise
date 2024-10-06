@@ -66,7 +66,7 @@ const patientReg = () => {
   const handleSubmit = async () => {
     if (validateInputs()) {
       try {
-        const response = await axios.post(`http://192.168.0.170:${PORT}/v1/patients/register`, details);
+        const response = await axios.post(`http://192.168.31.145:${PORT}/v1/patients/register`, details);
         console.log(details);
         if (response.status === 200) {
           alert(`Patient Registered Successfully. Patient ID: ${response.data.patient_id}`);

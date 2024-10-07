@@ -7,6 +7,12 @@ import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { printToFileAsync } from 'expo-print';
+import { shareAsync } from 'expo-sharing';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+
+
 
 
 
@@ -31,6 +37,7 @@ const Prescription = () => {
     { id: 3, visualAcuity: 'Corrected Visual Acuity (With new correction)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
   ];
   const visualOptions = ['NA', '6/5', '6/6', '6/12', '6/24', '6/36', '6/48', '6/60', '3/60', '2/60', '1/60', 'HM', 'PL', 'NPL'];
+  
   const handlePickerChange = (side, type, value, id) => {
     switch (side) {
       case 'right':
@@ -83,6 +90,178 @@ const Prescription = () => {
   const [checked10, setChecked10] = useState(false);
   const [checked11, setChecked11] = useState(false);
 
+  const [doctorNumber, setDoctorNumber] = useState('');
+
+  const generatePDF = async () => {
+    const { pres_date, pres_patientno, pres_patientname } = prescription;
+    
+    const visualAcuityData = data.map(item => ({
+      visualAcuity: item.visualAcuity,
+      rightDV: selectedRightDV[item.id] || 'NA',
+      rightNV: selectedRightNV[item.id] || 'NA',
+      leftDV: selectedLeftDV[item.id] || 'NA',
+      leftNV: selectedLeftNV[item.id] || 'NA',
+    }));
+
+    const refractiveError = {
+      right: {
+        DV: {
+          sphere: dvrightSphere.toFixed(2),
+          cylinder: dvrightCylinder.toFixed(2),
+          axis: dvrightAxis,
+        },
+        NV: {
+          sphere: nvrightSphere.toFixed(2),
+          cylinder: nvrightCylinder.toFixed(2),
+          axis: nvrightAxis,
+        },
+      },
+      left: {
+        DV: {
+          sphere: dvleftSphere.toFixed(2),
+          cylinder: dvleftCylinder.toFixed(2),
+          axis: dvleftAxis,
+        },
+        NV: {
+          sphere: nvleftSphere.toFixed(2),
+          cylinder: nvleftCylinder.toFixed(2),
+          axis: nvleftAxis,
+        },
+      },
+    };
+
+    const bifocalOptions = [
+      checked1 && "KR",
+      checked2 && "Exec",
+      checked3 && "D",
+      checked4 && "Tri",
+      checked5 && "Omni",
+      checked6 && "Progressive",
+    ].filter(Boolean).join(", ");
+
+    const colorOptions = [
+      checked7 && "White",
+      checked8 && "Sp2Alpha",
+      checked9 && "Photogrey",
+      checked10 && "Photosun",
+      checked11 && "Photobrown",
+    ].filter(Boolean).join(", ");
+
+    const htmlContent = `
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { text-align: center; color: #333; }
+          .section { margin-bottom: 20px; }
+          .section h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+          th { background-color: #f2f2f2; }
+          .sub-section { margin-top: 10px; }
+        </style>
+      </head>
+      <body>
+        <h1>Prescription</h1>
+
+        <div class="section">
+          <h2>Patient Information</h2>
+          <p><strong>Date:</strong> ${pres_date}</p>
+          <p><strong>Patient No:</strong> ${pres_patientno}</p>
+          <p><strong>Patient Name:</strong> ${pres_patientname}</p>
+        </div>
+
+        <div class="section">
+          <h2>Visual Acuity</h2>
+          <table>
+            <tr>
+              <th>Visual Acuity</th>
+              <th colspan="2">Right Eye</th>
+              <th colspan="2">Left Eye</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>DV</th>
+              <th>NV</th>
+              <th>DV</th>
+              <th>NV</th>
+            </tr>
+            ${visualAcuityData.map(row => `
+              <tr>
+                <td>${row.visualAcuity}</td>
+                <td>${row.rightDV}</td>
+                <td>${row.rightNV}</td>
+                <td>${row.leftDV}</td>
+                <td>${row.leftNV}</td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+
+        <div class="section">
+          <h2>Refractive Error</h2>
+          <table>
+            <tr>
+              <th rowspan="2">Eye</th>
+              <th colspan="3">DV</th>
+              <th colspan="3">NV</th>
+            </tr>
+            <tr>
+              <th>Sphere</th>
+              <th>Cylinder</th>
+              <th>Axis</th>
+              <th>Sphere</th>
+              <th>Cylinder</th>
+              <th>Axis</th>
+            </tr>
+            <tr>
+              <td>Right</td>
+              <td>${refractiveError.right.DV.sphere}</td>
+              <td>${refractiveError.right.DV.cylinder}</td>
+              <td>${refractiveError.right.DV.axis}</td>
+              <td>${refractiveError.right.NV.sphere}</td>
+              <td>${refractiveError.right.NV.cylinder}</td>
+              <td>${refractiveError.right.NV.axis}</td>
+            </tr>
+            <tr>
+              <td>Left</td>
+              <td>${refractiveError.left.DV.sphere}</td>
+              <td>${refractiveError.left.DV.cylinder}</td>
+              <td>${refractiveError.left.DV.axis}</td>
+              <td>${refractiveError.left.NV.sphere}</td>
+              <td>${refractiveError.left.NV.cylinder}</td>
+              <td>${refractiveError.left.NV.axis}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="section">
+          <h2>Bifocal Options</h2>
+          <p>${bifocalOptions || 'None'}</p>
+        </div>
+
+        <div class="section">
+          <h2>Color Options</h2>
+          <p>${colorOptions || 'None'}</p>
+        </div>
+
+        <div class="section">
+          <h2>Doctor Information</h2>
+          <p><strong>Doctor No:</strong> ${doctorNumber || 'N/A'}</p>
+        </div>
+      </body>
+    </html>
+  `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Share your prescription' });
+      console.log('PDF generated and shared successfully!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+  const [isSliderActive, setIsSliderActive] = useState(false);
   return (
     <View style={{ flex: 1 }}>
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
@@ -95,6 +274,7 @@ const Prescription = () => {
         <View style={{ flex: 1}}>
           <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Prescription</Text>
         </View>
+        <Button title="Generate PDF" onPress={generatePDF} />
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -161,7 +341,7 @@ const Prescription = () => {
           <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
 
           {/* -----------------------Visual Acuity Table----------------------- */}
-          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
+          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}} scrollEnabled={!isSliderActive}>
             <View>
           {/* Right EYE */}
               <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
@@ -234,6 +414,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"  // Color for the left side of the slider
                         maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
                         thumbTintColor="#358D9C"         // Color of the slider thumb
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                     
@@ -250,6 +433,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                       
@@ -266,6 +452,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                 {/* NV */}
@@ -285,6 +474,9 @@ const Prescription = () => {
                           minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                           maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                           thumbTintColor="#F52D2D"         // Color of the slider thumb
+                          onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                         />
                       </View>
                     
@@ -301,6 +493,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                       
@@ -317,6 +512,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
             </View>
@@ -394,6 +592,9 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"  // Color for the left side of the slider
                     maximumTrackTintColor="#D3D3D3"  // Color for the right side of the slider
                     thumbTintColor="#1E90FF"         // Color of the slider thumb
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                 
@@ -410,6 +611,9 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                   
@@ -426,6 +630,9 @@ const Prescription = () => {
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
             {/* NV */}
@@ -445,6 +652,9 @@ const Prescription = () => {
                       minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                       maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                       thumbTintColor="#F52D2D"         // Color of the slider thumb
+                      onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                      onTouchEnd={() => setIsSliderActive(false)}
+
                     />
                   </View>
                 
@@ -461,6 +671,9 @@ const Prescription = () => {
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                   
@@ -477,6 +690,9 @@ const Prescription = () => {
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                    onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
           </View>
@@ -557,7 +773,7 @@ const Prescription = () => {
           
           <View style={{margin: 20, flex: 1, flexDirection: 'row', justifyContent: "space-around"}}>
             <Text style={{fontSize: 20, paddingTop: 3}}>Doctor No:</Text>
-            <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}}></TextInput>
+            <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}} onChangeText={(e) => setDoctorNumber(e)}></TextInput>
           </View>
 
           {/* -----------------------Submit Button----------------------- */}

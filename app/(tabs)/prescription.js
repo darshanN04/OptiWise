@@ -7,6 +7,12 @@ import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { printToFileAsync } from 'expo-print';
+import { shareAsync } from 'expo-sharing';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+
+
 
 
 
@@ -31,6 +37,7 @@ const Prescription = () => {
     { id: 3, visualAcuity: 'Corrected Visual Acuity (With new correction)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
   ];
   const visualOptions = ['NA', '6/5', '6/6', '6/12', '6/24', '6/36', '6/48', '6/60', '3/60', '2/60', '1/60', 'HM', 'PL', 'NPL'];
+  
   const handlePickerChange = (side, type, value, id) => {
     switch (side) {
       case 'right':
@@ -97,6 +104,7 @@ const Prescription = () => {
         <View style={{ flex: 1}}>
           <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Prescription</Text>
         </View>
+        <Button title="Generate PDF" onPress={generatePDF} />
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -164,7 +172,7 @@ const Prescription = () => {
 
           {/* -----------------------Visual Acuity Table----------------------- */}
           <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}} scrollEnabled={!isSliderActive} // Disable scrolling when interacting with sliders
-          >
+           scrollEnabled={!isSliderActive}>
             <View>
           {/* Right EYE */}
               <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
@@ -238,6 +246,9 @@ const Prescription = () => {
                         maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
                         thumbTintColor="#358D9C"         // Color of the slider thumb
                         onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
                         onTouchEnd={() => setIsSliderActive(false)} 
                       />
                     </View>
@@ -255,6 +266,9 @@ const Prescription = () => {
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                         onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
                         onTouchEnd={() => setIsSliderActive(false)} 
                       />
@@ -584,7 +598,7 @@ const Prescription = () => {
           
           <View style={{margin: 20, flex: 1, flexDirection: 'row', justifyContent: "space-around"}}>
             <Text style={{fontSize: 20, paddingTop: 3}}>Doctor No:</Text>
-            <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}}></TextInput>
+            <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}} onChangeText={(e) => setDoctorNumber(e)}></TextInput>
           </View>
 
           {/* -----------------------Submit Button----------------------- */}

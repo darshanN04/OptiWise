@@ -182,13 +182,16 @@ const PatientForm = () => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <Link href="../(patientdetails)/prescriptionhistory" style={styles.button}>
+            <Link 
+            href={`../(patientdetails)/prescriptionhistory?patientId=${patientId}`}
+             style={styles.button}
+             >
               <Text>View Prescription History</Text>
             </Link>
           </View>
 
           <View style={styles.buttonContainer}>
-            <Link href="../(auth)/login" style={styles.button}>
+            <Link href="../(tabs)Patient Details" style={styles.button}>
               <Text>Submit</Text>
             </Link>
           </View>

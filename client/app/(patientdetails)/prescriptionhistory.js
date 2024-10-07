@@ -1,10 +1,33 @@
-import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput } from 'react-native';
-import React from 'react';
-import { Link } from 'expo-router';
+import { ScrollView, StyleSheet, Text, View, Image, Dimensions, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
 const PrescriptionHistory = () => {
+  const { patientId } = useLocalSearchParams();
+  const [prescriptionIds, setPrescriptionIds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch prescription history when the component mounts
+  useEffect(() => {
+    const fetchPrescriptionHistory = async () => {
+      try {
+        const response = await axios.get(`http://192.168.31.145:7002/v1/prescriptions/patient/${patientId}`);
+        console.log(response.data.prescription_ids)
+        setPrescriptionIds(response.data.prescription_ids);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrescriptionHistory();
+  }, [patientId]);
+
   return (
     <View style={{ flex: 1 }}>
       {/* Header Section */}
@@ -27,11 +50,27 @@ const PrescriptionHistory = () => {
         {/* Patient Information */}
         <View style={{ alignItems: "center", marginBottom: 20 }}>
           <Text>Patient No.</Text>
-          <Text>fetched</Text>
+          <Text>{patientId}</Text>
           <Text>Patient Name</Text>
           <Text>fetched</Text>
         </View>
-        
+
+        {/* Loading Indicator */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#FF4545" />
+        ) : error ? (
+          <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
+        ) : (
+          prescriptionIds.length > 0 ? (
+            prescriptionIds.map((id, index) => (
+              <View key={index} style={styles.prescriptionItem}>
+                <Text style={styles.prescriptionText}>Prescription ID: {id}</Text>
+              </View>
+            ))
+          ) : (
+            <Text style={{ textAlign: 'center' }}>No prescriptions found for this patient.</Text>
+          )
+        )}
       </ScrollView>
     </View>
   );
@@ -44,7 +83,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
-    marginBottom: 40
+    marginBottom: 40,
   },
   button: {
     padding: 10,
@@ -55,6 +94,19 @@ const styles = StyleSheet.create({
     margin: 10,
     width: 100,
     marginTop: 20,
-    fontSize: 15
+    fontSize: 15,
+  },
+  prescriptionItem: {
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 5,
+    width: '90%', // or any width you want
+    alignSelf: 'center',
+  },
+  prescriptionText: {
+    fontSize: 16,
   },
 });

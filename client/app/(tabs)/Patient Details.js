@@ -10,7 +10,6 @@ import {
   Modal,
   Pressable,
   FlatList,
-  Clipboard,
 } from "react-native";
 import React, { useState } from "react";
 import { Link } from "expo-router";
@@ -60,7 +59,6 @@ const PatientDetails = () => {
   };
 
   const handlePatientSelect = async (patientId) => {
-    await Clipboard.setString(patientId.toString());
     handleClearSearch();
   };
 

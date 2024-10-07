@@ -126,5 +126,21 @@ const getPatientWithDetails = async (req, res) => {
     return res.status(200).json(data); 
 };
 
+const getPatientNameById = async (req, res) => {
+    const { patientId } = req.params;
+    const { data, error } = await supabase
+        .from('patient')
+        .select('name') // Select only the name field
+        .eq('patient_id', patientId)
+        .single(); 
 
-export { getAllPatientDetails, searchPatientByNameAndPhone ,registerPatient,getPatientWithDetails}
+    if (error || !data) {
+        console.error('Error fetching patient name:', error);
+        return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    return res.status(200).json({ name: data.name }); // Return the patient name
+};
+
+
+export { getAllPatientDetails, searchPatientByNameAndPhone ,registerPatient,getPatientWithDetails,getPatientNameById}

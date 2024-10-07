@@ -6,6 +6,8 @@ const getPrescriptionIds = async (req, res) => {
     if (!patient_id) {
         return res.status(400).json({ error: 'Patient ID is required' });
     }
+
+    // Call the Supabase RPC function
     const { data, error } = await supabase.rpc('display_prescription_id', { p_id: patient_id });
 
     if (error) {
@@ -17,7 +19,10 @@ const getPrescriptionIds = async (req, res) => {
         return res.status(404).json({ message: 'No prescriptions found for this patient' });
     }
 
-    return res.status(200).json({ prescription_ids: data });
+    // Convert prescription_ids to strings to avoid truncation of large numbers
+    const prescriptionIdsAsString = data.map(id => id.toString());
+
+    return res.status(200).json({ prescription_ids: prescriptionIdsAsString });
 };
 const getPrescriptionById = async (req, res) => {
     const { id } = req.params; 

@@ -56,7 +56,7 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} /> */}
-          <Tabs.Screen name="Appointment Dashboard"
+          <Tabs.Screen name="AppointmentDashboard"
                      options={{
                       title:"Appointment Dashboard",
                       headerShown: false,  
@@ -67,7 +67,7 @@ export default function workLayout() {
                       color={color}
                       focused={focused}/> 
                       )}} />
-          <Tabs.Screen name="Patient Details"
+          <Tabs.Screen name="PatientDetails"
                      options={{
                       title:"Patient Details",
                       headerShown: false,  

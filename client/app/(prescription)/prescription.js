@@ -1,18 +1,82 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef ,useEffect} from 'react';
 import cal from "../../assets/icons/calender.png";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';     
 
 
 
 
 const { width } = Dimensions.get('window'); // Get the screen width
 
-const Prescription = () => {
+  const Prescription = () => {
+    const { token } = useLocalSearchParams(); // Extract the token from search params
+    const [patientId, setPatientId] = useState('');
+  
+    const fetchPatientId = async (token) => {
+      try {
+        const response = await fetch(`http://192.168.31.145:7002/v1/appointments/patientid?token=${token}`); // Use token as a query parameter
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+  
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        return data.patient_id; // Adjust based on your API response structure
+      } catch (error) {
+        console.error('Error fetching patient ID:', error);
+      }
+    };
+    const getPatientNameById = async (patientId) => {
+      try {
+        const response = await fetch(`http://192.168.31.145:7002/v1/patients/name/${patientId}`);
+  
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+  
+        const data = await response.json();
+        const patientName = data.name; // Access the patient name from the response
+  
+        // Update the state with the patient name
+        setPrescription((prevState) => ({
+          ...prevState,
+          pres_patientname: patientName,
+        }));
+  
+      } catch (error) {
+        console.error("Failed to fetch patient name:", error);
+      }
+    };
+  
+    // Use useEffect to call the fetch function when the component mounts or patientId changes
+    useEffect(() => {
+      if (patientId) {
+        getPatientNameById(patientId); // Fetch the patient name
+      }
+    }, [patientId]);
+  
+    useEffect(() => {
+      const loadPatientId = async () => {
+        if (token) {
+          const fetchedPatientId = await fetchPatientId(token);
+          console.log("Fetched Patient ID:", fetchedPatientId); // Log the fetched patient ID
+          setPatientId(fetchedPatientId); // Set the patient ID state
+          setPrescription((prev) => ({ ...prev, pres_patientno: fetchedPatientId }));
+        } else {
+          console.warn("No token found."); // Log when no token is available
+        }
+      };
+  
+      loadPatientId(); // Fetch the patient ID
+    }, [token]);
+
+
 
   const [prescription, setPrescription] = useState({
     pres_date: "",

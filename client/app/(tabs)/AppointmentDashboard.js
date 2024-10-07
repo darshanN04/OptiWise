@@ -1,13 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native'; 
-import { Link } from 'expo-router';
+import { Link } from 'expo-router'; // Import Link from expo-router
 
 const { width } = Dimensions.get('window');
 
 const AppointmentDashboard = () => {
   const [tokens, setTokens] = useState([]);
-  const navigation = useNavigation(); 
 
   const fetchTokens = async () => {
     try {
@@ -25,10 +23,6 @@ const AppointmentDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleTokenPress = (token) => {
-    navigation.navigate('../Home', { token });
-  };
-
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.header}>
@@ -39,13 +33,13 @@ const AppointmentDashboard = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.container}>
           {tokens.map((item, index) => (
-            <TouchableOpacity
+            <Link
               key={index}
+              href={`../prescription?token=${item.tokens}`} // Set href to navigate to prescription page with token
               style={styles.tokenBox}
-              onPress={() => handleTokenPress(item.tokens)}
             >
               <Text style={styles.tokenText}>{item.tokens}</Text>
-            </TouchableOpacity>
+            </Link>
           ))}
         </View>
       </ScrollView>

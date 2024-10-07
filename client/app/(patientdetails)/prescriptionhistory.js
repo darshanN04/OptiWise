@@ -64,7 +64,10 @@ const PrescriptionHistory = () => {
           prescriptionIds.length > 0 ? (
             prescriptionIds.map((id, index) => (
               <View key={index} style={styles.prescriptionItem}>
-                <Text style={styles.prescriptionText}>Prescription ID: {id}</Text>
+                {/* Make the prescription ID clickable and navigate to PrescriptionView */}
+                <Link href={`../(prescription)/PrescriptionView?prescriptionId=${id}`} style={styles.link}>
+                  <Text style={styles.prescriptionText}>Prescription ID: {id}</Text>
+                </Link>
               </View>
             ))
           ) : (
@@ -108,5 +111,9 @@ const styles = StyleSheet.create({
   },
   prescriptionText: {
     fontSize: 16,
+  },
+  link: {
+    textDecorationLine: 'underline',
+    color: '#007bff',
   },
 });

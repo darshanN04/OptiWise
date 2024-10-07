@@ -12,9 +12,10 @@ export default function Login() {
 
   return (
     <LinearGradient
-      colors={['#BB8CF9', '#58008E']}
+      colors={['#FFFFFF', '#7DF9FF']}
+      locations={[0, 0.27, 1]} // 0.27 corresponds to 27%
       style={styles.container}
-    >
+    >
       <View style={styles.content}>
         <Text style={styles.login}>Login</Text>
 

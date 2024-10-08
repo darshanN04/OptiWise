@@ -13,7 +13,7 @@ const PrescriptionHistory = () => {
   useEffect(() => {
     const fetchPrescriptionHistory = async () => {
       try {
-        const response = await axios.get(`http://10.52.4.152:7002/v1/prescriptions/patient/${patientId}`);
+        const response = await axios.get(`http://192.168.0.170:7002/v1/prescriptions/patient/${patientId}`);
         console.log(response.data.prescription_ids)
         setPrescriptionIds(response.data.prescription_ids);
       } catch (err) {
@@ -30,14 +30,12 @@ const PrescriptionHistory = () => {
     <View style={{ flex: 1 }}>
       {/* Header Section */}
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <Link href="../(profile)/profile" style={{ height: 100, left: width * 0.05, top: 25 }}>
-          <Image 
-            source={require('../../assets/images/Logo.png')} 
-            style={{ width: 60, height: 50 }} 
-          />
-        </Link>
+        <Image
+          source={require("../../assets/images/Logo1.png")}
+          style={styles.logo}
+        />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Prescription History</Text>
+          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" , marginTop: 120, fontWeight: 'bold'}}>Prescription History</Text>
         </View>
       </View>
 
@@ -49,8 +47,6 @@ const PrescriptionHistory = () => {
         <View style={{ alignItems: "center", marginBottom: 20 }}>
           <Text>Patient No.</Text>
           <Text>{patientId}</Text>
-          <Text>Patient Name</Text>
-          <Text>fetched</Text>
         </View>
 
         {/* Loading Indicator */}
@@ -113,5 +109,12 @@ const styles = StyleSheet.create({
   link: {
     textDecorationLine: 'underline',
     color: '#007bff',
+  },
+  logo: {
+    width: 70,
+    height: 60,
+    position: 'absolute',
+    top: 50,
+    left: 20,
   },
 });

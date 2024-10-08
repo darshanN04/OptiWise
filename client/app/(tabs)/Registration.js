@@ -1,11 +1,15 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Button, Platform, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { LinearGradient } from 'expo-linear-gradient';
+// import { BlurView } from 'expo-blur';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
 import { API_URL, PORT } from '@env';
 import { Link } from "expo-router";
 const { width } = Dimensions.get('window');
+import { BlurView } from 'expo-blur';
+
 
 const patientReg = () => {
   const [details, setDetails] = useState({
@@ -68,7 +72,7 @@ const patientReg = () => {
   const handleSubmit = async () => {
     if (validateInputs()) {
       try {
-        const response = await axios.post(`http://10.52.4.152:${PORT}/v1/patients/register`, details);
+        const response = await axios.post(`http://192.168.0.170:${PORT}/v1/patients/register`, details);
         console.log(details);
         if (response.status === 200) {
           alert(`Patient Registered Successfully. Patient ID: ${response.data.patient_id}`);
@@ -83,25 +87,31 @@ const patientReg = () => {
   };
 
   return (
+    <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
     <View style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
-        <Link href="../(profile)/profile" style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/images/Logo1.png")}
-            style={styles.logo}
-          />
-        </Link>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Patient Registration</Text>
-        </View>
+        <BlurView intensity={100} blurAmount={130} tint="light"style={styles.blurContainer}>
+          <Link href="../(profile)/profile" style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/images/Logo1.png")}
+              style={styles.logo}
+            />
+          </Link>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerText}>Registration</Text>
+          </View>
+        </BlurView>
       </View>
-
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ paddingTop: 200, zIndex: 4, paddingLeft: 20, gap: 30 }}>
           <Text style={{ fontSize: 20, marginBottom: 0, textDecorationLine: 'underline' }}>Personal Information :</Text>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Full Name: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Full Name: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
@@ -114,11 +124,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Date of Birth: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Date of Birth: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Select Date"
+                placeholder="    Select Date"
+                placeholderTextColor='black'
                 value={details.dob}
                 onFocus={showDatePickerHandler}
               />
@@ -139,7 +150,7 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Father's Name: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Father's Name: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
@@ -152,7 +163,7 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Gender: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Gender: </Text>
             <View style={styles.inputContainer3}>
               <Picker
                 selectedValue={details.gender}
@@ -169,7 +180,7 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Phone Number: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Phone Number: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
@@ -183,11 +194,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Aadhaar Number: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Aadhaar Number: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 keyboardType="numeric"
                 value={details.aadhaar_no}
                 onChangeText={(e) => setDetails({ ...details, aadhaar_no: e })}
@@ -197,11 +209,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Occupation: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Occupation: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 value={details.occupation}
                 onChangeText={(e) => setDetails({ ...details, occupation: e })}
               />
@@ -209,11 +222,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Address: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Address: </Text>
             <View style={styles.inputContainer1}>
               <TextInput
                 style={styles.inputField1}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 value={details.address}
                 onChangeText={(e) => setDetails({ ...details, address: e })}
               />
@@ -224,11 +238,12 @@ const patientReg = () => {
           <Text style={{ fontSize: 20, marginBottom: 0, textDecorationLine: 'underline' }}>Additional Information :</Text>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Emergency Contact Name: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Emergency Contact Name: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 value={details.emergency_name}
                 onChangeText={(e) => setDetails({ ...details, emergency_name: e })}
               />
@@ -237,11 +252,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Emergency Contact Number: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Emergency Contact Number: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 keyboardType="numeric"
                 value={details.emergency_phone}
                 onChangeText={(e) => setDetails({ ...details, emergency_phone: e })}
@@ -251,11 +267,12 @@ const patientReg = () => {
           </View>
 
           <View>
-            <Text style={{ fontSize: 16 }}>Emergency Contact Relation: </Text>
+            <Text style={{ fontSize: 16, paddingLeft: 10, }}>Emergency Contact Relation: </Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
-                placeholder="Enter"
+                placeholder="    Enter"
+                placeholderTextColor='black'
                 value={details.emergency_relation}
                 onChangeText={(e) => setDetails({ ...details, emergency_relation: e })}
               />
@@ -271,16 +288,23 @@ const patientReg = () => {
         </View>
       </ScrollView>
     </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerContainer: {
-    height: 200,
-    backgroundColor: "#FF4545",
+    height: 150,
+    backgroundColor: "transparent",
     width: width,
     position: "absolute",
-    zIndex: 10,
+    zIndex: 1000,
+  },
+  scrollViewContent: {
+    marginTop: 60,
   },
   logoContainer: {
     height: 100,
@@ -296,17 +320,17 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 30,
-    color: "white",
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: 5
   },
   inputContainer: {
+    backgroundColor: '#FFFFFFAA',
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#B0B0B0',
+    borderWidth: 2,
+    borderColor: 'purple',
     borderRadius: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -315,10 +339,11 @@ const styles = StyleSheet.create({
     marginBottom: 0, // Reduced margin to close gap between input and error
   },
   inputContainer1: {
+    backgroundColor: '#FFFFFFAA',
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#B0B0B0',
+    borderWidth: 2,
+    borderColor: 'purple',
     borderRadius: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -327,10 +352,11 @@ const styles = StyleSheet.create({
     marginBottom: 0, // Apply same here if needed
   },
   inputContainer3: {
+    backgroundColor: '#FFFFFFAA',
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#B0B0B0',
+    borderWidth: 2,
+    borderColor: 'purple',
     borderRadius: 15,
     paddingHorizontal: 10,
     paddingVertical: 0, // Reduced padding for the gender box

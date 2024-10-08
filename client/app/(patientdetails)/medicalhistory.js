@@ -30,8 +30,6 @@ const MedicalHistory = () => {
       <View style={{ alignItems: "center", marginBottom: 20 }}>
   <Text>Patient No.</Text>
   <Text>{patientId}</Text>
-  <Text>Patient Name</Text>
-  <Text>fetched</Text>
 </View>
 
         {/* Medical Information Sections */}
@@ -67,9 +65,6 @@ const MedicalHistory = () => {
         <View style={styles.buttonContainer}>
           <Link href="../(patientdetails)/patientform" style={styles.button}>
             <Text>Search</Text>
-          </Link>
-          <Link href="" style={styles.button}>
-            <Text>Go back</Text>
           </Link>
         </View>
       </ScrollView>

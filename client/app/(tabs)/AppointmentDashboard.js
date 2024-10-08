@@ -1,15 +1,17 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router'; // Import Link from expo-router
 
 const { width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const AppointmentDashboard = () => {
   const [tokens, setTokens] = useState([]);
 
   const fetchTokens = async () => {
     try {
-      const response = await fetch('http://10.52.4.152:7002/v1/appointments/tokens');
+      const response = await fetch('http://192.168.0.170:7002/v1/appointments/tokens');
       const data = await response.json();
       setTokens(data.tokens); 
     } catch (error) {
@@ -24,6 +26,11 @@ const AppointmentDashboard = () => {
   }, []);
 
   return (
+    <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
     <View style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
         <Link href="../(profile)/profile" style={styles.logoContainer}>
@@ -51,15 +58,19 @@ const AppointmentDashboard = () => {
         </View>
       </ScrollView>
     </View>
+    </LinearGradient>
   );
 };
 
 export default AppointmentDashboard;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerContainer: {
-    height: 200,
-    backgroundColor: "#FF4545",
+    height: 150,
+    backgroundColor: "transparent",
     width: width,
     position: "absolute",
     zIndex: 10,
@@ -77,10 +88,9 @@ const styles = StyleSheet.create({
     left: 20,
   },
   headerText: {
-    fontSize: 30,
-    color: "white",
+    fontSize: 25,
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
     marginTop: 20
   },
@@ -93,24 +103,26 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'flex-start', // Aligns items to the left
     padding: 10,
+    height: 1000
   },
   tokenBox: {
-    width: width * 0.20,
-    height: width * 0.20,
-    backgroundColor: '#FFCCCB',
-    paddingLeft: 10,
-    flex:1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 5,
+    width: (width -20) * 0.25 - 20,
+    height: (width -20) * 0.25 - 20,
+    backgroundColor: '#00E6FB',
+    borderWidth: 0,
+    shadowColor: 'transparent',
+    // borderWidth: 0,
+    // shadowColor: '#000',
+    elevation: 5,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    margin: 10,
     borderRadius: 10,
     elevation: 5,
   },
   tokenText: {
     fontSize: 24,
     fontWeight: 'bold',
-    flex:1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    color: "black"
   },
 });

@@ -3,23 +3,27 @@ import React, { useState, useRef ,useEffect} from 'react';
 import cal from "../../assets/icons/calender.png";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import Slider from '@react-native-community/slider';
 import { Button, CheckBox } from 'react-native-elements';
 import { Link } from 'expo-router';
-import { useLocalSearchParams } from 'expo-router';     
+import { useLocalSearchParams } from 'expo-router'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';    
+import { BlurView } from 'expo-blur';
+
 
 
 
 
 const { width } = Dimensions.get('window'); 
 
-  const Prescription = () => {
+ const Prescription = () => {
     const { token } = useLocalSearchParams(); 
     const [patientId, setPatientId] = useState('');
   
     const fetchPatientId = async (token) => {
       try {
-        const response = await fetch(`http://10.52.4.152:7002/v1/appointments/patientid?token=${token}`); 
+        const response = await fetch(`http://192.168.0.170:7002/v1/appointments/patientid?token=${token}`); 
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -34,7 +38,7 @@ const { width } = Dimensions.get('window');
     };
     const getPatientNameById = async (patientId) => {
       try {
-        const response = await fetch(`http://10.52.4.152:7002/v1/patients/name/${patientId}`);
+        const response = await fetch(`http://192.168.0.170:7002/v1/patients/name/${patientId}`);
   
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -73,17 +77,17 @@ const { width } = Dimensions.get('window');
     }, [token]);
 
 
+    const [prescription, setPrescription] = useState({
+      pres_date: new Date().toLocaleDateString(),
+      pres_patientno: "",
+      pres_patientname: "",
+      pres_patientid: 0,
+    });
 
-  const [prescription, setPrescription] = useState({
-    pres_date: "",
-    pres_patientno: "",
-    pres_patientname: "",
-    pres_patientid: 0,
-  });
-  const [selectedRightDV, setSelectedRightDV] = useState({});
-  const [selectedRightNV, setSelectedRightNV] = useState({});
-  const [selectedLeftDV, setSelectedLeftDV] = useState({});
-  const [selectedLeftNV, setSelectedLeftNV] = useState({});
+    const [selectedRightDV, setSelectedRightDV] = useState({});
+    const [selectedRightNV, setSelectedRightNV] = useState({});
+    const [selectedLeftDV, setSelectedLeftDV] = useState({});
+    const [selectedLeftNV, setSelectedLeftNV] = useState({});
   const data = [
     { id: 1, visualAcuity: 'Unaided Visual Acuity (Without glasses)', rightDV: '20/30', rightNV: '20/40', leftDV: '20/25', leftNV: '20/35' },
     { id: 2, visualAcuity: 'Best corrected Visual Acuity (With old glasses)', rightDV: '20/20', rightNV: '20/30', leftDV: '20/40', leftNV: '20/50' },
@@ -99,7 +103,26 @@ const { width } = Dimensions.get('window');
       else if (type === 'cylinder') setDVLeftCylinder(value);
     }
   };
+
+  const handlePickerChange = (eye, type, value, id) => {
+    if (eye === 'left') {
+      if (type === 'DV') {
+        setSelectedLeftDV({ ...selectedLeftDV, [id]: value });
+      } else if (type === 'NV') {
+        setSelectedLeftNV({ ...selectedLeftNV, [id]: value });
+      }
+    }
+    if (eye === 'right') {
+      if (type === 'DV') {
+        setSelectedRightDV({ ...selectedRightDV, [id]: value });
+      } else if (type === 'NV') {
+        setSelectedRightNV({ ...selectedRightNV, [id]: value });
+      }
+    }
+  };
   
+
+
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -140,11 +163,117 @@ const { width } = Dimensions.get('window');
   const [checked10, setChecked10] = useState(false);
   const [checked11, setChecked11] = useState(false);
   const [isSliderActive, setIsSliderActive] = useState(false);
+  const [doctorId, setDoctorId] = useState('');
+
+  const fetchDoctorId = async () => {
+    try {
+      const email = await AsyncStorage.getItem('doctorEmail'); // Replace with your actual key
+      if (email) {
+        const response = await fetch(`http://192.168.0.170:7002/v1/doctor/doctorsid?email=${email}`);
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+    
+        const data = await response.json();
+        console.log("Doctor ID fetched successfully:", data.doctor_id);
+        return data.doctor_id; 
+      } else {
+        console.warn("No email found in AsyncStorage.");
+      }
+    } catch (error) {
+      console.error('Error fetching doctor ID:', error);
+    }
+  };
+  useEffect(() => {
+    const loadDoctorId = async () => {
+      const fetchedDoctorId = await fetchDoctorId();
+      if (fetchedDoctorId) {
+        setDoctorId(fetchedDoctorId);
+      }
+    };
+  
+    loadDoctorId();
+  }, []);
+
+  const submitPrescription = async () => {
+    try {
+        const response = await fetch('http://192.168.0.170:7002/v1/prescriptions/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                p_id: prescription.pres_patientno, // Patient ID
+                d_id: doctorId, // Doctor ID
+                // Left Eye Values
+                l_without_dv: selectedLeftDV.vision_dv || '',
+                l_without_nv: selectedLeftNV.vision_nv || '',
+                l_with_dv: selectedLeftDV.vision_dv || '',
+                l_with_nv: selectedLeftNV.vision_nv || '',
+                l_vision_dv: selectedLeftDV.vision_dv || '',
+                l_vision_nv: selectedLeftNV.vision_nv || '',
+                l_sphere_dv: dvleftSphere, // Slider value
+                l_cyl_dv: dvleftCylinder,
+                l_axis_dv: dvleftAxis,
+                l_sphere_nv: nvleftSphere,
+                l_cyl_nv: nvleftCylinder,
+                l_axis_nv: nvleftAxis,
+                // Right Eye Values
+                r_without_dv: selectedRightDV.vision_dv || '',
+                r_without_nv: selectedRightNV.vision_nv || '',
+                r_with_dv: selectedRightDV.vision_dv || '',
+                r_with_nv: selectedRightNV.vision_nv || '',
+                r_vision_dv: selectedRightDV.vision_dv || '',
+                r_vision_nv: selectedRightNV.vision_nv || '',
+                r_sphere_dv: dvrightSphere,
+                r_cyl_dv: dvrightCylinder,
+                r_axis_dv: dvrightAxis,
+                r_sphere_nv: nvrightSphere,
+                r_cyl_nv: nvrightCylinder,
+                r_axis_nv: nvrightAxis,
+                // Prescription-related Fields
+                p_ipd: 10, // Replace with actual IPD value
+                p_colour: [
+                    checked7 && "White",       // If checked7 is true, "White" will be added
+                    checked8 && "Sp2Alpha",    // If checked8 is true, "Sp2Alpha" will be added
+                    checked9 && "Photogrey",   // If checked9 is true, "Photogrey" will be added
+                    checked10 && "Photosun",   // If checked10 is true, "Photosun" will be added
+                    checked11 && "Photobrown", // If checked11 is true, "Photobrown" will be added
+                ].filter(Boolean).join(", "), // Convert array to comma-separated string
+                p_remarks: 'DV Only', // Replace with actual remarks
+                bifocalOptions: [
+                    checked1 && "KR",          // If checked1 is true, "KR" will be added
+                    checked2 && "Exec",        // If checked2 is true, "Exec" will be added
+                    checked3 && "D",           // If checked3 is true, "D" will be added
+                    checked4 && "Tri",         // If checked4 is true, "Tri" will be added
+                    checked5 && "Omni",        // If checked5 is true, "Omni" will be added
+                    checked6 && "Progressive", // If checked6 is true, "Progressive" will be added
+                ].filter(Boolean).join(", "), // Convert array to comma-separated string
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to add prescription');
+        }
+
+        console.log('Prescription added successfully:', data);
+        // Optionally, handle success (e.g., navigation, alerts)
+
+    } catch (error) {
+        console.error('Error adding prescription:', error);
+        // Optionally, show an error alert to the user
+    }
+};
 
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.headerContainer}>
+
+return (
+  <View style={{ flex: 1 }}>
+    <View style={styles.headerContainer}>
+      <BlurView intensity={50} style={styles.blurContainer}>
         <Link href="../(profile)/profile" style={styles.logoContainer}>
           <Image
             source={require("../../assets/images/Logo1.png")}
@@ -154,522 +283,489 @@ const { width } = Dimensions.get('window');
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerText}>Prescription</Text>
         </View>
-      </View>
+      </BlurView>
+    </View>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={{ paddingTop: 200, zIndex: 4, gap: 10 }}>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ paddingTop: 200, zIndex: 4, gap: 10 }}>
-
-          {/* Date and Patient No. */}
-          <View style={{ flex: 1, flexDirection: "row", gap:20,marginLeft: width*.08 }}>
-            <View>
-              <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Date: </Text>
-              <View style={styles.inputContainer}>
-                <TouchableOpacity onPress={showDatePickerHandler} style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-                  <TextInput
-                    style={styles.inputField}
-                    placeholder="Select Date"
-                    value={prescription.pres_date} // Show selected date
-                    editable={false} // Prevent keyboard from opening
-                  />
-                  <Image source={cal} style={{ height: 20, width: 20, marginLeft: 10 }} />
-                </TouchableOpacity>
-              </View>
-
-              {/* DateTimePicker */}
-              {showDatePicker && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={date}
-                  mode="date"
-                  display="default"
-                  onChange={onChange}
-                  maximumDate={new Date()} // Ensure future dates can't be selected
-                />
-              )}
-            </View>
-
-            {/* Patient No. */}
-            <View>
-              <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient No: </Text>
-              <View style={styles.inputContainer}>
+        {/* Date and Patient No. */}
+        <View style={{ flex: 1, flexDirection: "row", gap:20,marginLeft: width*.08 }}>
+          <View>
+            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Date: </Text>
+            <View style={styles.inputContainer}>
+              <TouchableOpacity onPress={showDatePickerHandler} style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
                 <TextInput
                   style={styles.inputField}
-                  placeholder=""
-                  keyboardType="numeric" // Specify numeric input for patient number
-                  value={prescription.pres_patientno.toString()}
-                  onChangeText={(e) => setPrescription({ ...prescription, pres_patientno: e })}
+                  placeholder="Select Date"
+                  value={prescription.pres_date} // Show selected date
+                  editable={false} // Prevent keyboard from opening
                 />
-              </View>
+                <Image source={cal} style={{ height: 20, width: 20, marginLeft: 10 }} />
+              </TouchableOpacity>
             </View>
+
+            {/* DateTimePicker */}
+            {showDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode="date"
+                display="default"
+                onChange={onChange}
+                maximumDate={new Date()} // Ensure future dates can't be selected
+              />
+            )}
           </View>
 
-          {/* Patient Name */}
-          <View style={{marginLeft: width*.08}}>
-            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient Name: </Text>
-            <View style={{width: width*.82,maxHeight: 50,borderRadius: 5,borderColor: 'black',borderWidth: 2,paddingLeft: 5,flexDirection: "row",alignItems: "center",marginBottom: 15,}}>
+          {/* Patient No. */}
+          <View>
+            <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient No: </Text>
+            <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputField}
                 placeholder=""
-                value={prescription.pres_patientname}
-                onChangeText={(e) => setPrescription({ ...prescription, pres_patientname: e })}
+                keyboardType="numeric" // Specify numeric input for patient number
+                value={prescription.pres_patientno.toString()}
+                onChangeText={(e) => setPrescription({ ...prescription, pres_patientno: e })}
               />
             </View>
           </View>
+        </View>
 
-          
-          <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
-
-          {/* -----------------------Visual Acuity Table----------------------- */}
-          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}} scrollEnabled={!isSliderActive} >
-            <View>
-          {/* Right EYE */}
-              <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
-                  <View>
-                    <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Right :</Text>
-                  </View>
-                  <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
-                    <View style={{ borderWidth: 1, borderColor: 'black' }}>
-
-                      {/* Table Header */}
-                      <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                        <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
-                        <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
-                          <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Right</Text>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
-                            <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      {/* Table Rows */}
-                      {data.map((item) => (
-                        <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                          <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
-
-                          {/* Right Eye Pickers */}
-                          <Picker
-                            selectedValue={selectedRightDV[item.id] || visualOptions[0]}
-                            style={{ height: 50, width: 120, alignSelf: 'center',flex: 1, justifyContent:'center' }}
-                            onValueChange={(value) => handlePickerChange('right', 'DV', value, item.id)}
-                          >
-                            {visualOptions.map((option, index) => (
-                              <Picker.Item key={index} label={option} value={option} />
-                            ))}
-                          </Picker>
-
-                          <Picker
-                            selectedValue={selectedRightNV[item.id] || visualOptions[0]}
-                            style={{ height: 50, width: 120, alignSelf: 'center' }}
-                            onValueChange={(value) => handlePickerChange('right', 'NV', value, item.id)}
-                          >
-                            {visualOptions.map((option, index) => (
-                              <Picker.Item key={index} label={option} value={option} />
-                            ))}
-                          </Picker>                  
-                        </View>
-                      ))}
-                    </View>
-                  </ScrollView>
-                
-              {/* -----------------------Range Slider----------------------- */}
-              
-                {/* DV */}
-                  {/* Right Eye Sphere */}
-                  
-                    <View>
-                      <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
-                      <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
-                    </View>
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={styles.valueText}>Sphere Value: {dvrightSphere.toFixed(2)}</Text>
-                      <Slider
-                        style={styles.rangeSlider}
-                        minimumValue={-10}   // Min value of slider
-                        maximumValue={10}    // Max value of slider
-                        step={0.25}         // Step size for the slider
-                        value={0}           // Initial value
-                        onValueChange={(val) => setDVRightSphere(val)} // Update the value as slider moves
-                        minimumTrackTintColor="#358D9C"  // Color for the left side of the slider
-                        maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
-                        thumbTintColor="#358D9C"         // Color of the slider thumb
-                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                      />
-                    </View>
-                    
-                  {/* Right Eye Cylinder */}
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={styles.valueText}>Cylinder Value: {dvrightCylinder.toFixed(2)}</Text>
-                      <Slider
-                        style={styles.rangeSlider}
-                        minimumValue={-6}
-                        maximumValue={6}
-                        step={0.25}
-                        value={0}
-                        onValueChange={(val) => setDVRightCylinder(val)}
-                        minimumTrackTintColor="#358D9C"
-                        maximumTrackTintColor="#358D9C"
-                        thumbTintColor="#358D9C"
-                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                      />
-                    </View>
-                      
-                  {/* Right Eye Axis */}
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={styles.valueText}>Axis Value: {dvrightAxis.toFixed(2)}</Text>
-                      <Slider
-                        style={styles.rangeSlider}
-                        minimumValue={0}
-                        maximumValue={180}
-                        step={1}
-                        value={0}
-                        onValueChange={(val) => setDVRightAxis(val)}
-                        minimumTrackTintColor="#358D9C"
-                        maximumTrackTintColor="#358D9C"
-                        thumbTintColor="#358D9C"
-                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                      />
-                    </View>
-                {/* NV */}
-                  {/* Right Eye Sphere NV */}
-                      <View>
-                        <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>NV :</Text>
-                      </View>
-                      <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                        <Text style={styles.valueText}>Sphere Value: {nvrightSphere.toFixed(2)}</Text>
-                        <Slider
-                          style={styles.rangeSlider}
-                          minimumValue={-10}   // Min value of slider
-                          maximumValue={10}    // Max value of slider
-                          step={0.25}         // Step size for the slider
-                          value={0}           // Initial value
-                          onValueChange={(val) => setNVRightSphere(val)} // Update the value as slider moves
-                          minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
-                          maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
-                          thumbTintColor="#F52D2D"         // Color of the slider thumb
-                          onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                        />
-                      </View>
-                    
-                  {/* Right Eye Cylinder NV */}
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={styles.valueText}>Cylinder Value: {nvrightCylinder.toFixed(2)}</Text>
-                      <Slider
-                        style={styles.rangeSlider}
-                        minimumValue={-6}
-                        maximumValue={6}
-                        step={0.25}
-                        value={0}
-                        onValueChange={(val) => setNVRightCylinder(val)}
-                        minimumTrackTintColor="#F52D2D"
-                        maximumTrackTintColor="#F52D2D"
-                        thumbTintColor="#F52D2D"
-                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                      />
-                    </View>
-                      
-                  {/* Right Eye Axis */}
-                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                      <Text style={styles.valueText}>Axis Value: {nvrightAxis.toFixed(2)}</Text>
-                      <Slider
-                        style={styles.rangeSlider}
-                        minimumValue={0}
-                        maximumValue={180}
-                        step={1}
-                        value={0}
-                        onValueChange={(val) => setNVRightAxis(val)}
-                        minimumTrackTintColor="#F52D2D"
-                        maximumTrackTintColor="#F52D2D"
-                        thumbTintColor="#F52D2D"
-                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                      />
-                    </View>
-            </View>
+        {/* Patient Name */}
+        <View style={{marginLeft: width*.08}}>
+          <Text style={{ fontSize: 16, marginBottom: 10, marginTop: 10 }}>Patient Name: </Text>
+          <View style={{width: width*.82,maxHeight: 50,borderRadius: 5,borderColor: 'black',borderWidth: 2,paddingLeft: 5,flexDirection: "row",alignItems: "center",marginBottom: 15,}}>
+            <TextInput
+              style={styles.inputField}
+              placeholder=""
+              value={prescription.pres_patientname}
+              onChangeText={(e) => setPrescription({ ...prescription, pres_patientname: e })}
+            />
           </View>
+        </View>
 
-          {/* ___LEFT EYE____ */}
+        
+        <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
+
+        {/* -----------------------Visual Acuity Table----------------------- */}
+        <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
           <View>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
-            <View>
-            <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Left :</Text>
-            </View>
-            <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
-              <View style={{ borderWidth: 1, borderColor: 'black' }}>
-
-              {/* Table Header */}
-                <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                  <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
-                  <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
-                    <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Left</Text>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
-                      <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
-                    </View>
-                  </View>
-                </View>
-
-              {/* Table Rows */}
-                {data.map((item) => (
-                  <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
-                    <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
-
-                    {/* Right Eye Pickers */}
-                    <Picker
-                      selectedValue={selectedLeftDV[item.id] || visualOptions[0]}
-                      style={{ height: 50, width: 120, alignSelf: 'center' }}
-                      onValueChange={(value) => handlePickerChange('left', 'DV', value, item.id)}
-                    >
-                      {visualOptions.map((option, index) => (
-                        <Picker.Item key={index} label={option} value={option} />
-                      ))}
-                    </Picker>
-
-                    <Picker
-                      selectedValue={selectedLeftNV[item.id] || visualOptions[0]}
-                      style={{ height: 50, width: 120, alignSelf: 'center' }}
-                      onValueChange={(value) => handlePickerChange('left', 'NV', value, item.id)}
-                    >
-                      {visualOptions.map((option, index) => (
-                        <Picker.Item key={index} label={option} value={option} />
-                      ))}
-                    </Picker>                  
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-            
-          {/* -----------------------Range Slider----------------------- */}
-          
-            {/* DV */}
-              {/* Left Eye Sphere */}
-               
+        {/* Right EYE */}
+            <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
                 <View>
-                  <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
-                  <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
+                  <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Right :</Text>
                 </View>
-                <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={styles.valueText}>Sphere Value: {dvleftSphere.toFixed(2)}</Text>
-                  <Slider
-                    style={styles.rangeSlider}
-                    minimumValue={-10}   // Min value of slider
-                    maximumValue={10}    // Max value of slider
-                    step={0.25}         // Step size for the slider
-                    value={0}           // Initial value
-                    onValueChange={(val) => setDVLeftSphere(val)} // Update the value as slider moves
-                    minimumTrackTintColor="#1E90FF"  // Color for the left side of the slider
-                    maximumTrackTintColor="#D3D3D3"  // Color for the right side of the slider
-                    thumbTintColor="#1E90FF"         // Color of the slider thumb
-                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
+                <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
+                  <View style={{ borderWidth: 1, borderColor: 'black' }}>
 
-                  />
-                </View>
+                    {/* Table Header */}
+                    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                      <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
+                      <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
+                        <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Right</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
+                          <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Table Rows */}
+                    {data.map((item) => (
+                      <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                        <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
+
+                        {/* Right Eye Pickers */}
+                        <Picker
+                          selectedValue={selectedRightDV[item.id] || visualOptions[0]}
+                          style={{ height: 50, width: 120, alignSelf: 'center',flex: 1, justifyContent:'center' }}
+                          onValueChange={(value) => handlePickerChange('right', 'DV', value, item.id)}
+                        >
+                          {visualOptions.map((option, index) => (
+                            <Picker.Item key={index} label={option} value={option} />
+                          ))}
+                        </Picker>
+
+                        <Picker
+                          selectedValue={selectedRightNV[item.id] || visualOptions[0]}
+                          style={{ height: 50, width: 120, alignSelf: 'center' }}
+                          onValueChange={(value) => handlePickerChange('right', 'NV', value, item.id)}
+                        >
+                          {visualOptions.map((option, index) => (
+                            <Picker.Item key={index} label={option} value={option} />
+                          ))}
+                        </Picker>                  
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
+              
+            {/* -----------------------Range Slider----------------------- */}
+            
+              {/* DV */}
+                {/* Right Eye Sphere */}
                 
-              {/* Left Eye Cylinder */}
-                <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={styles.valueText}>Cylinder Value: {dvleftCylinder.toFixed(2)}</Text>
-                  <Slider
-                    style={styles.rangeSlider}
-                    minimumValue={-6}
-                    maximumValue={6}
-                    step={0.25}
-                    value={0}
-                    onValueChange={(val) => setDVLeftCylinder(val)}
-                    minimumTrackTintColor="#1E90FF"
-                    maximumTrackTintColor="#D3D3D3"
-                    thumbTintColor="#1E90FF"
-                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                  />
-                </View>
-                  
-              {/* Left Eye Axis */}
-                <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={styles.valueText}>Axis Value: {dvleftAxis.toFixed(2)}</Text>
-                  <Slider
-                    style={styles.rangeSlider}
-                    minimumValue={0}
-                    maximumValue={180}
-                    step={1}
-                    value={0}
-                    onValueChange={(val) => setDVLeftAxis(val)}
-                    minimumTrackTintColor="#1E90FF"
-                    maximumTrackTintColor="#D3D3D3"
-                    thumbTintColor="#1E90FF"
-                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                  />
-                </View>
-            {/* NV */}
-              {/* Left Eye Sphere NV */}
                   <View>
-                    <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>NV :</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
                   </View>
                   <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={styles.valueText}>Sphere Value: {nvleftSphere.toFixed(2)}</Text>
+                    <Text style={styles.valueText}>Sphere Value: {dvrightSphere.toFixed(2)}</Text>
                     <Slider
                       style={styles.rangeSlider}
                       minimumValue={-10}   // Min value of slider
                       maximumValue={10}    // Max value of slider
                       step={0.25}         // Step size for the slider
                       value={0}           // Initial value
-                      onValueChange={(val) => setNVLeftSphere(val)} // Update the value as slider moves
-                      minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
-                      maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
-                      thumbTintColor="#F52D2D"         // Color of the slider thumb
-                      onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
+                      onValueChange={(val) => setDVRightSphere(val)} // Update the value as slider moves
+                      minimumTrackTintColor="#358D9C"  // Color for the left side of the slider
+                      maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
+                      thumbTintColor="#358D9C"         // Color of the slider thumb
                     />
                   </View>
-                
-              {/* Left Eye Cylinder NV */}
-              <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={styles.valueText}>Cylinder Value: {nvleftCylinder.toFixed(2)}</Text>
-                  <Slider
-                    style={styles.rangeSlider}
-                    minimumValue={-6}
-                    maximumValue={6}
-                    step={0.25}
-                    value={0}
-                    onValueChange={(val) => setNVLeftCylinder(val)}
-                    minimumTrackTintColor="#F52D2D"
-                    maximumTrackTintColor="#F52D2D"
-                    thumbTintColor="#F52D2D"
-                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
-                  />
-                </View>
                   
-              {/* Left Eye Axis */}
+                {/* Right Eye Cylinder */}
+                  <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={styles.valueText}>Cylinder Value: {dvrightCylinder.toFixed(2)}</Text>
+                    <Slider
+                      style={styles.rangeSlider}
+                      minimumValue={-6}
+                      maximumValue={6}
+                      step={0.25}
+                      value={0}
+                      onValueChange={(val) => setDVRightCylinder(val)}
+                      minimumTrackTintColor="#358D9C"
+                      maximumTrackTintColor="#358D9C"
+                      thumbTintColor="#358D9C"
+                    />
+                  </View>
+                    
+                {/* Right Eye Axis */}
+                  <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={styles.valueText}>Axis Value: {dvrightAxis.toFixed(2)}</Text>
+                    <Slider
+                      style={styles.rangeSlider}
+                      minimumValue={0}
+                      maximumValue={180}
+                      step={1}
+                      value={0}
+                      onValueChange={(val) => setDVRightAxis(val)}
+                      minimumTrackTintColor="#358D9C"
+                      maximumTrackTintColor="#358D9C"
+                      thumbTintColor="#358D9C"
+                    />
+                  </View>
+              {/* NV */}
+                {/* Right Eye Sphere NV */}
+                    <View>
+                      <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>NV :</Text>
+                    </View>
+                    <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                      <Text style={styles.valueText}>Sphere Value: {nvrightSphere.toFixed(2)}</Text>
+                      <Slider
+                        style={styles.rangeSlider}
+                        minimumValue={-10}   // Min value of slider
+                        maximumValue={10}    // Max value of slider
+                        step={0.25}         // Step size for the slider
+                        value={0}           // Initial value
+                        onValueChange={(val) => setNVRightSphere(val)} // Update the value as slider moves
+                        minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
+                        maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
+                        thumbTintColor="#F52D2D"         // Color of the slider thumb
+                      />
+                    </View>
+                  
+                {/* Right Eye Cylinder NV */}
+                  <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={styles.valueText}>Cylinder Value: {nvrightCylinder.toFixed(2)}</Text>
+                    <Slider
+                      style={styles.rangeSlider}
+                      minimumValue={-6}
+                      maximumValue={6}
+                      step={0.25}
+                      value={0}
+                      onValueChange={(val) => setNVRightCylinder(val)}
+                      minimumTrackTintColor="#F52D2D"
+                      maximumTrackTintColor="#F52D2D"
+                      thumbTintColor="#F52D2D"
+                    />
+                  </View>
+                    
+                {/* Right Eye Axis */}
+                  <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={styles.valueText}>Axis Value: {nvrightAxis.toFixed(2)}</Text>
+                    <Slider
+                      style={styles.rangeSlider}
+                      minimumValue={0}
+                      maximumValue={180}
+                      step={1}
+                      value={0}
+                      onValueChange={(val) => setNVRightAxis(val)}
+                      minimumTrackTintColor="#F52D2D"
+                      maximumTrackTintColor="#F52D2D"
+                      thumbTintColor="#F52D2D"
+                    />
+                  </View>
+          </View>
+        </View>
+
+        {/* ___LEFT EYE____ */}
+        <View>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
+          <View>
+          <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Left :</Text>
+          </View>
+          <ScrollView horizontal={true} style={{ height: "auto", flex: 1, marginTop: 20, paddingHorizontal: 0 }}>
+            <View style={{ borderWidth: 1, borderColor: 'black' }}>
+
+            {/* Table Header */}
+              <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                <Text style={{ fontWeight: 'bold', padding: 10, borderWidth: 0, borderColor: 'transparent', width: 100, textAlign: 'center', alignSelf: 'center' }}>Visual Acuity</Text>
+                <View style={{ width: 240, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ fontWeight: 'bold', paddingVertical: 5 }}>Left</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black' }}>DV</Text>
+                    <Text style={{ fontWeight: 'bold', width: 120, textAlign: 'center', borderTopWidth: 1, borderColor: 'black', borderLeftWidth: 1 }}>NV</Text>
+                  </View>
+                </View>
+              </View>
+
+            {/* Table Rows */}
+              {data.map((item) => (
+                <View key={item.id} style={{ flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ padding: 10, borderWidth: 1, borderColor: '#000', width: 100, textAlign: 'center', fontSize: 12, borderBottomWidth: 0,borderRightWidth: 2 }}>{item.visualAcuity}</Text>
+
+                  {/* Right Eye Pickers */}
+                  <Picker
+                    selectedValue={selectedLeftDV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 120, alignSelf: 'center' }}
+                    onValueChange={(value) => handlePickerChange('left', 'DV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>
+
+                  <Picker
+                    selectedValue={selectedLeftNV[item.id] || visualOptions[0]}
+                    style={{ height: 50, width: 120, alignSelf: 'center' }}
+                    onValueChange={(value) => handlePickerChange('left', 'NV', value, item.id)}
+                  >
+                    {visualOptions.map((option, index) => (
+                      <Picker.Item key={index} label={option} value={option} />
+                    ))}
+                  </Picker>                  
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+          
+        {/* -----------------------Range Slider----------------------- */}
+        
+          {/* DV */}
+            {/* Left Eye Sphere */}
+             
+              <View>
+                <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Refractive Error :</Text>
+                <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>DV :</Text>
+              </View>
+              <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.valueText}>Sphere Value: {dvleftSphere.toFixed(2)}</Text>
+                <Slider
+                  style={styles.rangeSlider}
+                  minimumValue={-10}   // Min value of slider
+                  maximumValue={10}    // Max value of slider
+                  step={0.25}         // Step size for the slider
+                  value={0}           // Initial value
+                  onValueChange={(val) => setDVLeftSphere(val)} // Update the value as slider moves
+                  minimumTrackTintColor="#1E90FF"  // Color for the left side of the slider
+                  maximumTrackTintColor="#D3D3D3"  // Color for the right side of the slider
+                  thumbTintColor="#1E90FF"         // Color of the slider thumb
+                />
+              </View>
+              
+            {/* Left Eye Cylinder */}
+              <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.valueText}>Cylinder Value: {dvleftCylinder.toFixed(2)}</Text>
+                <Slider
+                  style={styles.rangeSlider}
+                  minimumValue={-6}
+                  maximumValue={6}
+                  step={0.25}
+                  value={0}
+                  onValueChange={(val) => setDVLeftCylinder(val)}
+                  minimumTrackTintColor="#1E90FF"
+                  maximumTrackTintColor="#D3D3D3"
+                  thumbTintColor="#1E90FF"
+                />
+              </View>
+                
+            {/* Left Eye Axis */}
+              <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.valueText}>Axis Value: {dvleftAxis.toFixed(2)}</Text>
+                <Slider
+                  style={styles.rangeSlider}
+                  minimumValue={0}
+                  maximumValue={180}
+                  step={1}
+                  value={0}
+                  onValueChange={(val) => setDVLeftAxis(val)}
+                  minimumTrackTintColor="#1E90FF"
+                  maximumTrackTintColor="#D3D3D3"
+                  thumbTintColor="#1E90FF"
+                />
+              </View>
+          {/* NV */}
+            {/* Left Eye Sphere NV */}
+                <View>
+                  <Text style={{ fontSize: 20, marginBottom: 0, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>NV :</Text>
+                </View>
                 <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={styles.valueText}>Axis Value: {nvleftAxis.toFixed(2)}</Text>
+                  <Text style={styles.valueText}>Sphere Value: {nvleftSphere.toFixed(2)}</Text>
                   <Slider
                     style={styles.rangeSlider}
-                    minimumValue={0}
-                    maximumValue={180}
-                    step={1}
-                    value={0}
-                    onValueChange={(val) => setNVLeftAxis(val)}
-                    minimumTrackTintColor="#F52D2D"
-                    maximumTrackTintColor="#F52D2D"
-                    thumbTintColor="#F52D2D"
-                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
-                        onTouchEnd={() => setIsSliderActive(false)}
-
+                    minimumValue={-10}   // Min value of slider
+                    maximumValue={10}    // Max value of slider
+                    step={0.25}         // Step size for the slider
+                    value={0}           // Initial value
+                    onValueChange={(val) => setNVLeftSphere(val)} // Update the value as slider moves
+                    minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
+                    maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
+                    thumbTintColor="#F52D2D"         // Color of the slider thumb
                   />
                 </View>
-          </View>
+              
+            {/* Left Eye Cylinder NV */}
+            <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.valueText}>Cylinder Value: {nvleftCylinder.toFixed(2)}</Text>
+                <Slider
+                  style={styles.rangeSlider}
+                  minimumValue={-6}
+                  maximumValue={6}
+                  step={0.25}
+                  value={0}
+                  onValueChange={(val) => setNVLeftCylinder(val)}
+                  minimumTrackTintColor="#F52D2D"
+                  maximumTrackTintColor="#F52D2D"
+                  thumbTintColor="#F52D2D"
+                />
+              </View>
+                
+            {/* Left Eye Axis */}
+              <View style={{borderBottom: 0, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={styles.valueText}>Axis Value: {nvleftAxis.toFixed(2)}</Text>
+                <Slider
+                  style={styles.rangeSlider}
+                  minimumValue={0}
+                  maximumValue={180}
+                  step={1}
+                  value={0}
+                  onValueChange={(val) => setNVLeftAxis(val)}
+                  minimumTrackTintColor="#F52D2D"
+                  maximumTrackTintColor="#F52D2D"
+                  thumbTintColor="#F52D2D"
+                />
+              </View>
         </View>
-      </ScrollView>
+      </View>
+    </ScrollView>
 
-          {/* -----------------------OTHER DETAILS----------------------- */}
+        {/* -----------------------OTHER DETAILS----------------------- */}
 
-          {/*Bifocal*/ }  
+        {/*Bifocal*/ }  
+        <View style={{margin: 10}}>
+            <Text style={{fontSize: 20}}>Bifocal:</Text>
+            
+            <CheckBox
+              title="KR"
+              checked={checked1}
+              onPress={() => setChecked1(!checked1)}
+            />
+            <CheckBox
+              title="Exec"
+              checked={checked2}
+              onPress={() => setChecked2(!checked2)}
+            />
+            <CheckBox
+              title="D"
+              checked={checked3}
+              onPress={() => setChecked3(!checked3)}
+            />
+            <CheckBox
+              title="Tri"
+              checked={checked4}
+              onPress={() => setChecked4(!checked4)}
+            />
+            <CheckBox
+              title="Omni"
+              checked={checked5}
+              onPress={() => setChecked5(!checked5)}
+            />
+            <CheckBox
+              title="Progressive"
+              checked={checked6}
+              onPress={() => setChecked6(!checked6)}
+            />
+          </View>
+
+        {/*Colour*/ }  
           <View style={{margin: 10}}>
-              <Text style={{fontSize: 20}}>Bifocal:</Text>
-              
-              <CheckBox
-                title="KR"
-                checked={checked1}
-                onPress={() => setChecked1(!checked1)}
-              />
-              <CheckBox
-                title="Exec"
-                checked={checked2}
-                onPress={() => setChecked2(!checked2)}
-              />
-              <CheckBox
-                title="D"
-                checked={checked3}
-                onPress={() => setChecked3(!checked3)}
-              />
-              <CheckBox
-                title="Tri"
-                checked={checked4}
-                onPress={() => setChecked4(!checked4)}
-              />
-              <CheckBox
-                title="Omni"
-                checked={checked5}
-                onPress={() => setChecked5(!checked5)}
-              />
-              <CheckBox
-                title="Progressive"
-                checked={checked6}
-                onPress={() => setChecked6(!checked6)}
-              />
-            </View>
-
-          {/*Colour*/ }  
-            <View style={{margin: 10}}>
-              <Text style={{fontSize: 20}}>Colour:</Text>
-              
-              <CheckBox
-                title="White"
-                checked={checked7}
-                onPress={() => setChecked7(!checked7)}
-              />
-              <CheckBox
-                title="Sp2Alpha"
-                checked={checked8}
-                onPress={() => setChecked8(!checked8)}
-              />
-              <CheckBox
-                title="Photogrey"
-                checked={checked9}
-                onPress={() => setChecked9(!checked9)}
-              />
-              <CheckBox
-                title="Photosun"
-                checked={checked10}
-                onPress={() => setChecked10(!checked10)}
-              />
-              <CheckBox
-                title="Photobrown"
-                checked={checked11}
-                onPress={() => setChecked11(!checked11)}
-              />
-            </View>
-
-
-          {/* -----------------------Doctor Number----------------------- */}
-          
-          <View style={{margin: 20, flex: 1, flexDirection: 'row', justifyContent: "space-around"}}>
-            <Text style={{fontSize: 20, paddingTop: 3}}>Doctor No:</Text>
-            <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}}></TextInput>
+            <Text style={{fontSize: 20}}>Colour:</Text>
+            
+            <CheckBox
+              title="White"
+              checked={checked7}
+              onPress={() => setChecked7(!checked7)}
+            />
+            <CheckBox
+              title="Sp2Alpha"
+              checked={checked8}
+              onPress={() => setChecked8(!checked8)}
+            />
+            <CheckBox
+              title="Photogrey"
+              checked={checked9}
+              onPress={() => setChecked9(!checked9)}
+            />
+            <CheckBox
+              title="Photosun"
+              checked={checked10}
+              onPress={() => setChecked10(!checked10)}
+            />
+            <CheckBox
+              title="Photobrown"
+              checked={checked11}
+              onPress={() => setChecked11(!checked11)}
+            />
           </View>
 
-          {/* -----------------------Submit Button----------------------- */}
 
-          <View style={styles.buttonContainer}>
-            <Link href="" style={styles.button}>
-              <Text>Submit</Text>
-            </Link>
-            <Link href="" style={styles.button}>
-              <Text>Go back</Text>
-            </Link>
-          </View>
-
+        {/* -----------------------Doctor Number----------------------- */}
+        
+        <View style={{margin: 20, flex: 1, flexDirection: 'row', justifyContent: "space-around"}}>
+          <Text style={{fontSize: 20, paddingTop: 3}}>Doctor No:</Text>
+          <TextInput style={{borderColor: "black", borderWidth: 1, width: 200, paddingLeft: 10, fontSize: 16, height: 40}} value={doctorId.toString()} // Display the doctor ID
+            editable={false} // Make the TextInput read-only, you can remove this if you want it editable
+      />
         </View>
-      </ScrollView>
-    </View>
-  );
+
+        {/* -----------------------Submit Button----------------------- */}
+
+        <View style={styles.buttonContainer}>
+  <Link 
+    href=""// Keep the path empty or use "#" to stay on the same screen
+    style={styles.button} 
+    onPress={submitPrescription} // Call submitPrescription on button press
+  >
+    <Text>Submit</Text>
+  </Link>
+</View>
+
+      </View>
+    </ScrollView>
+  </View>
+);
 };
 
 export default Prescription;
@@ -702,49 +798,49 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 20
   },
-  inputContainer: {
-    width: 150,
-    maxHeight: 50,
-    borderRadius: 5,
-    borderColor: 'black',
-    borderWidth: 2,
-    paddingLeft: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 0,
-  },
-  inputField: {
-    fontSize: 18,
-    flex: 1,
-    flexDirection: "row",
-    color: "black",
-  },
-  
-  valueText: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  rangeSlider: {
-    width: 350,
-    height: 10,
-    marginBottom: 15,
-    elevation: 20
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
-    marginBottom: 40
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    color: 'white',
-    textAlign: 'center',
-    borderRadius: 5,
-    margin: 10,
-    width: 100,
-    marginTop: 20,
-    fontSize: 15
-  },
+inputContainer: {
+  width: 150,
+  maxHeight: 50,
+  borderRadius: 5,
+  borderColor: 'black',
+  borderWidth: 2,
+  paddingLeft: 5,
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 0,
+},
+inputField: {
+  fontSize: 18,
+  flex: 1,
+  flexDirection: "row",
+  color: "black",
+},
+
+valueText: {
+  fontSize: 20,
+  marginBottom: 20,
+},
+rangeSlider: {
+  width: 350,
+  height: 10,
+  marginBottom: 15,
+  elevation: 20
+},
+buttonContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  width: '100%',
+  marginBottom: 40
+},
+button: {
+  padding: 10,
+  backgroundColor: '#007bff',
+  color: 'white',
+  textAlign: 'center',
+  borderRadius: 5,
+  margin: 10,
+  width: 100,
+  marginTop: 20,
+  fontSize: 15
+},
 });

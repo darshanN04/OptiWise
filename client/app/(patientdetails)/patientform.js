@@ -12,7 +12,7 @@ const PatientForm = () => {
     try {
       console.log(`Fetching patient details for patient ID: ${patientId}`); 
 
-      const response = await fetch(`http://10.52.4.152:7002/v1/patients/${patientId}`);
+      const response = await fetch(`http://192.168.0.170:7002/v1/patients/${patientId}`);
       const data = await response.json();
 
       console.log('Raw response data:', data); 
@@ -55,16 +55,17 @@ const PatientForm = () => {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <Link href="../(profile)/profile" style={{ height: 100, left: width * 0.05, top: 25 }}>
-          <Image source={require('../../assets/images/Logo.png')} style={{ width: 60, height: 50 }} />
-        </Link>
+        <Image
+          source={require("../../assets/images/Logo1.png")}
+          style={styles.logo}
+        />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Patient Log</Text>
+          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" , marginTop: 120, fontWeight: 'bold'}}>Patient Log</Text>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ paddingTop: 200, zIndex: 4, paddingLeft: 20, gap: 30 }}>
+        <View style={{ paddingTop: 200, zIndex: 4, paddingLeft: 20, gap: 30 , margin: 50}}>
           <Text style={{ fontSize: 20, marginBottom: 0, textDecorationLine: 'underline' }}>Personal Information :</Text>
 
           {/* Patient ID */}
@@ -203,10 +204,10 @@ export default PatientForm;
 
 const styles = StyleSheet.create({
   buttonContainer: {
+    margin: -5,
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
-    marginBottom: 40
   },
   button: {
     padding: 10,
@@ -214,10 +215,8 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     borderRadius: 5,
-    margin: 10,
     width: 200,
-    marginTop: 20,
-    fontSize: 15
+    fontSize: 15,
   },
   inputContainer: {
     borderWidth: 1,
@@ -234,5 +233,12 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-  }
+  },
+  logo: {
+    width: 70,
+    height: 60,
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
 });

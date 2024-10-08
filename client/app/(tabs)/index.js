@@ -40,7 +40,7 @@ const Appointment = () => {
 
       const queryString = query.join('&');
 
-      const response = await fetch(`http://10.52.4.152:7002/v1/patients/search?${queryString}`);
+      const response = await fetch(`http://192.168.0.170:7002/v1/patients/search?${queryString}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -66,7 +66,7 @@ const Appointment = () => {
     }
 
     try {
-      const response = await fetch('http://10.52.4.152:7002/v1/appointments/create', {
+      const response = await fetch('http://192.168.0.170:7002/v1/appointments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

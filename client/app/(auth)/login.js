@@ -40,11 +40,13 @@ export default function Login({ navigation }) {
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setErrorModalVisible(true);
+      
+      router.push('../(tabs)/Registration');
       return;
     }
     
     try {
-      const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/login`,{
+      const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/login`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +58,7 @@ export default function Login({ navigation }) {
 
       if (response.ok) {
         console.log('Login successful'); 
-        const doctorRoleResponse = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/roleID?email=${email}`);
+        const doctorRoleResponse = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/roleID?email=${email}`);
         const doctorRoleResult = await doctorRoleResponse.json();
         await AsyncStorage.setItem('doctorRole', doctorRoleResult.role.toString());
 

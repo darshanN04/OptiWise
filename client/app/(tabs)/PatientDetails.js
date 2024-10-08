@@ -43,7 +43,7 @@ const PatientDetails = () => {
 
       const queryString = query.join("&");
       const response = await fetch(
-        `http://10.52.4.152:7002/v1/patients/search?${queryString}`
+        `http://192.168.0.170:7002/v1/patients/search?${queryString}`
       );
       const data = await response.json();
 
@@ -148,7 +148,7 @@ const PatientDetails = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.searchButton}
+            style={styles.resetButton}
             onPress={handleClearSearch}
           >
             <Text style={styles.searchButtonText}>Reset</Text>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 220,
+    marginTop: 120,
   },
   label: {
     fontSize: 20,
@@ -254,9 +254,19 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: "#007bff",
+    width: 150,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     marginTop: 20,
+    elevation: 8,
+  },
+  resetButton: {
+    backgroundColor: '#FF3333',
+    padding: 10,
+    width: 150,
+    borderRadius: 10,
+    marginTop: 20,
+    elevation: 8,
   },
   searchButtonText: {
     color: "white",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL, PORT } from '@env';
 import { Link } from "expo-router";
@@ -30,7 +31,7 @@ const Profile = () => {
           console.log(`API_URL: ${API_URL}, PORT: ${PORT}`);
 
           // Fetch doctor profile from the backend
-          const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
+          const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -66,7 +67,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/logout`, {
+      const response = await fetch(`http://192.168.0.170:${PORT}/v1/doctor/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -92,6 +93,11 @@ const Profile = () => {
 
   // Conditionally rendering based on loading, error, and fetched data
   return (
+    <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
     <View style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
         <Link href="../(profile)/profile" style={styles.logoContainer}>
@@ -156,15 +162,19 @@ const Profile = () => {
         </View>
       </Modal>
     </View>
+    </LinearGradient>
   );
 };
 
 export default Profile;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerContainer: {
-    height: 200,
-    backgroundColor: "#FF4545",
+    height: 150,
+    backgroundColor: "transparent",
     width: width,
     position: "absolute",
     zIndex: 10,
@@ -183,11 +193,10 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 30,
-    color: "white",
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: -20
   },
   scrollContainer: {
     flexGrow: 1,

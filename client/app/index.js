@@ -16,7 +16,7 @@ export default function Home() {
         <Image source={require('../assets/images/Logo1.png')} style={styles.logo} />
         <View style={styles.buttonContainer}>
           <Link href="./(auth)/login" style={styles.button}>
-            <Ionicons name="arrow-forward-outline" size={30} color="#7DF9FF" style={styles.icon} />
+            <Ionicons name="arrow-forward-outline" size={40} color="#7DF9FF" style={styles.icon} />
           </Link>
         </View>
       </View>
@@ -45,20 +45,15 @@ const styles = StyleSheet.create({
   },
   button: {
     flexDirection: 'row',
+    felx: 1,
     alignItems: 'center',
-    padding: 15,
-    borderRadius: 80,
-    margin: 10,
-    width: 65,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-    justifyContent: 'center',
+    marginLeft: 70,
+    width: 100,
+    height: 60
     
   },
   icon: {
-    color: "white",
+    color: "#113670",
+    height: 10,
   },
 });

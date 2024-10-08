@@ -2,34 +2,32 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Activ
 import React, { useState, useEffect } from 'react';
 import { Link, useLocalSearchParams } from 'expo-router';
 
-const { width } = Dimensions.get('window'); // Get the screen width
+const { width } = Dimensions.get('window'); 
 
 const PatientForm = () => {
-  const { patientId } = useLocalSearchParams(); // Retrieve the patientId from query params
-  const [patientData, setPatientData] = useState(null); // State to hold patient data
-  const [loading, setLoading] = useState(true); // State to manage loading state
-
-  // Function to fetch patient details from the backend API
+  const { patientId } = useLocalSearchParams(); 
+  const [patientData, setPatientData] = useState(null); 
+  const [loading, setLoading] = useState(true);
   const fetchPatientDetails = async () => {
     try {
-      console.log(`Fetching patient details for patient ID: ${patientId}`); // Debugging statement to log patient ID
+      console.log(`Fetching patient details for patient ID: ${patientId}`); 
 
-      const response = await fetch(`http://192.168.31.145:7002/v1/patients/${patientId}`); // Use the getPatientWithDetails API
+      const response = await fetch(`http://10.52.4.152:7002/v1/patients/${patientId}`);
       const data = await response.json();
 
-      console.log('Raw response data:', data); // Debugging statement to log raw response data
+      console.log('Raw response data:', data); 
 
       if (response.ok) {
-        setPatientData(data); // Set the patient data received from the API
-        console.log('Patient data set successfully:', data); // Debugging statement to confirm data is set
+        setPatientData(data); 
+        console.log('Patient data set successfully:', data);
       } else {
         console.error('Error fetching patient details:', data);
       }
 
-      setLoading(false); // Stop loading
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching patient details:', error);
-      setLoading(false); // Stop loading on error
+      setLoading(false); 
     }
   };
 

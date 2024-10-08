@@ -11,15 +11,15 @@ import { useLocalSearchParams } from 'expo-router';
 
 
 
-const { width } = Dimensions.get('window'); // Get the screen width
+const { width } = Dimensions.get('window'); 
 
   const Prescription = () => {
-    const { token } = useLocalSearchParams(); // Extract the token from search params
+    const { token } = useLocalSearchParams(); 
     const [patientId, setPatientId] = useState('');
   
     const fetchPatientId = async (token) => {
       try {
-        const response = await fetch(`http://192.168.31.145:7002/v1/appointments/patientid?token=${token}`); // Use token as a query parameter
+        const response = await fetch(`http://10.52.4.152:7002/v1/appointments/patientid?token=${token}`); 
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -27,23 +27,21 @@ const { width } = Dimensions.get('window'); // Get the screen width
   
         const data = await response.json();
         console.log("Fetched data:", data);
-        return data.patient_id; // Adjust based on your API response structure
+        return data.patient_id; 
       } catch (error) {
         console.error('Error fetching patient ID:', error);
       }
     };
     const getPatientNameById = async (patientId) => {
       try {
-        const response = await fetch(`http://192.168.31.145:7002/v1/patients/name/${patientId}`);
+        const response = await fetch(`http://10.52.4.152:7002/v1/patients/name/${patientId}`);
   
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
   
         const data = await response.json();
-        const patientName = data.name; // Access the patient name from the response
-  
-        // Update the state with the patient name
+        const patientName = data.name; 
         setPrescription((prevState) => ({
           ...prevState,
           pres_patientname: patientName,
@@ -53,11 +51,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
         console.error("Failed to fetch patient name:", error);
       }
     };
-  
-    // Use useEffect to call the fetch function when the component mounts or patientId changes
     useEffect(() => {
       if (patientId) {
-        getPatientNameById(patientId); // Fetch the patient name
+        getPatientNameById(patientId); 
       }
     }, [patientId]);
   
@@ -65,15 +61,15 @@ const { width } = Dimensions.get('window'); // Get the screen width
       const loadPatientId = async () => {
         if (token) {
           const fetchedPatientId = await fetchPatientId(token);
-          console.log("Fetched Patient ID:", fetchedPatientId); // Log the fetched patient ID
-          setPatientId(fetchedPatientId); // Set the patient ID state
+          console.log("Fetched Patient ID:", fetchedPatientId); 
+          setPatientId(fetchedPatientId); 
           setPrescription((prev) => ({ ...prev, pres_patientno: fetchedPatientId }));
         } else {
-          console.warn("No token found."); // Log when no token is available
+          console.warn("No token found."); 
         }
       };
   
-      loadPatientId(); // Fetch the patient ID
+      loadPatientId();
     }, [token]);
 
 
@@ -110,9 +106,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(false); // Close the picker after selection
+    setShowDatePicker(false); 
     setDate(currentDate);
-    setPrescription({ ...prescription, pres_date: currentDate.toLocaleDateString() }); // Update the date in state
+    setPrescription({ ...prescription, pres_date: currentDate.toLocaleDateString() }); 
   };
 
   const showDatePickerHandler = () => {
@@ -143,18 +139,20 @@ const { width } = Dimensions.get('window'); // Get the screen width
   const [checked9, setChecked9] = useState(false);
   const [checked10, setChecked10] = useState(false);
   const [checked11, setChecked11] = useState(false);
+  const [isSliderActive, setIsSliderActive] = useState(false);
+
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <Link href="../(profile)/profile" style={{height: 100, left: width*0.05, top: 25}}>
-          <Image 
-            source={require('../../assets/images/Logo.png')} 
-            style={{ width: 60, height: 50 }} 
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
           />
         </Link>
-        <View style={{ flex: 1}}>
-          <Text style={{ fontSize: 30, color: "white", alignSelf: "center" }}>Prescription</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Prescription</Text>
         </View>
       </View>
 
@@ -222,7 +220,7 @@ const { width } = Dimensions.get('window'); // Get the screen width
           <Text style={{ fontSize: 20, marginBottom: 10, marginTop: 10, textAlign: "center", textDecorationLine:"underline" }}>Visual Acuity :</Text>
 
           {/* -----------------------Visual Acuity Table----------------------- */}
-          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
+          <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}} scrollEnabled={!isSliderActive} >
             <View>
           {/* Right EYE */}
               <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
@@ -295,6 +293,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                         minimumTrackTintColor="#358D9C"  // Color for the left side of the slider
                         maximumTrackTintColor="#358D9C"  // Color for the right side of the slider
                         thumbTintColor="#358D9C"         // Color of the slider thumb
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                     
@@ -311,6 +312,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                       
@@ -327,6 +331,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                         minimumTrackTintColor="#358D9C"
                         maximumTrackTintColor="#358D9C"
                         thumbTintColor="#358D9C"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                 {/* NV */}
@@ -346,6 +353,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                           minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                           maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                           thumbTintColor="#F52D2D"         // Color of the slider thumb
+                          onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                         />
                       </View>
                     
@@ -362,6 +372,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
                       
@@ -378,6 +391,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                         minimumTrackTintColor="#F52D2D"
                         maximumTrackTintColor="#F52D2D"
                         thumbTintColor="#F52D2D"
+                        onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                       />
                     </View>
             </View>
@@ -455,6 +471,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                     minimumTrackTintColor="#1E90FF"  // Color for the left side of the slider
                     maximumTrackTintColor="#D3D3D3"  // Color for the right side of the slider
                     thumbTintColor="#1E90FF"         // Color of the slider thumb
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                 
@@ -471,6 +490,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                   
@@ -487,6 +509,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                     minimumTrackTintColor="#1E90FF"
                     maximumTrackTintColor="#D3D3D3"
                     thumbTintColor="#1E90FF"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
             {/* NV */}
@@ -506,6 +531,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                       minimumTrackTintColor="#F52D2D"  // Color for the left side of the slider
                       maximumTrackTintColor="#F52D2D"  // Color for the right side of the slider
                       thumbTintColor="#F52D2D"         // Color of the slider thumb
+                      onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                     />
                   </View>
                 
@@ -522,6 +550,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
                   
@@ -538,6 +569,9 @@ const { width } = Dimensions.get('window'); // Get the screen width
                     minimumTrackTintColor="#F52D2D"
                     maximumTrackTintColor="#F52D2D"
                     thumbTintColor="#F52D2D"
+                    onTouchStart={() => setIsSliderActive(true)} // Disable ScrollView scrolling
+                        onTouchEnd={() => setIsSliderActive(false)}
+
                   />
                 </View>
           </View>
@@ -641,6 +675,33 @@ const { width } = Dimensions.get('window'); // Get the screen width
 export default Prescription;
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    height: 200,
+    backgroundColor: "#FF4545",
+    width: width,
+    position: "absolute",
+    zIndex: 10,
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
+  },
+  logo: {
+    width: 70,
+    height: 60,
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
+  headerText: {
+    fontSize: 30,
+    color: "white",
+    alignSelf: "center",
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 20
+  },
   inputContainer: {
     width: 150,
     maxHeight: 50,

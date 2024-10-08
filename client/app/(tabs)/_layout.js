@@ -29,7 +29,7 @@ export default function workLayout() {
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
                       name=""
-                      icon={icons.rightArrow}
+                      icon={icons.registration}
                       color={color}
                       focused={focused}/> 
                       )}} />
@@ -63,7 +63,7 @@ export default function workLayout() {
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
                       name=""
-                      icon={icons.leftArrow}
+                      icon={icons.prescription}
                       color={color}
                       focused={focused}/> 
                       )}} />
@@ -74,7 +74,7 @@ export default function workLayout() {
                       tabBarIcon: ({color, focused})=>(
                       <TabIcon 
                       name=""
-                      icon={icons.eye}
+                      icon={icons.patient}
                       color={color}
                       focused={focused}/> 
                       )}} />

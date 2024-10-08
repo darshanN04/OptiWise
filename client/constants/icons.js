@@ -7,6 +7,9 @@ import eyeHide from "../assets/icons/eye-hide.png";
 import eye from "../assets/icons/eye.png";
 import appointment from "../assets/icons/appointment.png";
 import prescription from "../assets/icons/prescription.png";
+import registration from "../assets/icons/registration.png";
+import patient from "../assets/icons/patient.png";
+
 export default {
   home,
   profile,
@@ -16,5 +19,7 @@ export default {
   eyeHide,
   eye,
   appointment,
-  prescription
+  prescription,
+  registration,
+  patient
 };

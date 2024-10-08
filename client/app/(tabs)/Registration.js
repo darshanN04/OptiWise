@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
 import { API_URL, PORT } from '@env';
+import { Link } from "expo-router";
 const { width } = Dimensions.get('window');
 
 const patientReg = () => {
@@ -35,7 +36,8 @@ const patientReg = () => {
     address: "",
     emergency_name: "",
     emergency_phone: "",
-    emergency_relation: ""
+    emergency_relation: "",
+    date:"",
   });
 
   const onChange = (event, selectedDate) => {
@@ -51,14 +53,14 @@ const patientReg = () => {
 
   const validateInputs = () => {
     const newErrors = {};
-    if (details.name.length < 2) newErrors.name = "Full name must be at least 2 characters long.";
-    if (details.father_name.length < 2) newErrors.father_name = "Father's name is required.";
-    if (!details.gender) newErrors.gender = "Gender must be selected.";
-    if (details.phone_no.length < 10) newErrors.phone_no = "Phone number must be at least 10 digits.";
-    if (details.aadhaar_no.length < 12) newErrors.aadhaar_no = "Aadhaar number must be 12 digits.";
+    if (details.name.length < 3) newErrors.name = "Full name must be at least 3 characters long.";
+    if (details.father_name.length < 3) newErrors.father_name = "Father's name is required.";
+    if (!details.gender) newErrors.gender = "Gender must be selected.";    
+    if (details.phone_no.length != 10 ) newErrors.phone_no = "Phone number must be 10 digits.";
+    if (details.aadhaar_no.length !=12) newErrors.aadhaar_no = "Aadhaar number must be 12 digits.";
     if (details.address.length < 3) newErrors.address = "Address is required";
     if (details.emergency_name.length < 3) newErrors.emergency_name = "Emergency contact name is required";
-    if (details.emergency_phone.length < 10) newErrors.emergency_phone = "Emergency phone number must be at least 10 digits.";
+    if (details.emergency_phone.length !=10) newErrors.emergency_phone = "Emergency phone number must be at least 10 digits.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -66,7 +68,7 @@ const patientReg = () => {
   const handleSubmit = async () => {
     if (validateInputs()) {
       try {
-        const response = await axios.post(`http://192.168.31.145:${PORT}/v1/patients/register`, details);
+        const response = await axios.post(`http://10.52.4.152:${PORT}/v1/patients/register`, details);
         console.log(details);
         if (response.status === 200) {
           alert(`Patient Registered Successfully. Patient ID: ${response.data.patient_id}`);
@@ -82,10 +84,15 @@ const patientReg = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ height: 200, backgroundColor: "#FF4545", width: width, position: "absolute", zIndex: 10 }}>
-        <View>
-          <Image source={require('../../assets/images/Logo1.png')} style={{ width: 70, height: 60, marginTop: 40, marginLeft: 300, marginBottom: 0 }} />
-          <Text style={{ fontSize: 30, alignSelf: 'center', marginTop: 10, color: "white" }}>Patient Registration</Text>
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
+          />
+        </Link>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Patient Registration</Text>
         </View>
       </View>
 
@@ -268,6 +275,33 @@ const patientReg = () => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    height: 200,
+    backgroundColor: "#FF4545",
+    width: width,
+    position: "absolute",
+    zIndex: 10,
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
+  },
+  logo: {
+    width: 70,
+    height: 60,
+    position: 'absolute',
+    top: 50,
+    left: 20,
+  },
+  headerText: {
+    fontSize: 30,
+    color: "white",
+    alignSelf: "center",
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 20
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -56,6 +56,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
     justifyContent: 'center',
+    
   },
-  icon: {},
+  icon: {
+    color: "white",
+  },
 });

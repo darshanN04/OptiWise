@@ -101,4 +101,5 @@ const getPrescriptionDetails = async (req, res) => {
 };
 
 
+
 export { getPrescriptionIds,getPrescriptionById,getPrescriptionDetails} 

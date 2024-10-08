@@ -43,7 +43,7 @@ const PatientDetails = () => {
 
       const queryString = query.join("&");
       const response = await fetch(
-        `http://192.168.31.145:7002/v1/patients/search?${queryString}`
+        `http://10.52.4.152:7002/v1/patients/search?${queryString}`
       );
       const data = await response.json();
 
@@ -211,16 +211,19 @@ const styles = StyleSheet.create({
     top: 25,
   },
   logo: {
-    width: 60,
-    height: 50,
-  },
-  headerTextContainer: {
-    flex: 1,
+    width: 70,
+    height: 60,
+    position: 'absolute',
+    top: 50,
+    left: 20,
   },
   headerText: {
     fontSize: 30,
     color: "white",
     alignSelf: "center",
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 20
   },
   searchContainer: {
     flex: 1,

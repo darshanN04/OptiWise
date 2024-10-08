@@ -3,19 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 
-const { width } = Dimensions.get('window'); // Get the screen width
+const { width } = Dimensions.get('window'); 
 
 const PrescriptionHistory = () => {
   const { patientId } = useLocalSearchParams();
   const [prescriptionIds, setPrescriptionIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Fetch prescription history when the component mounts
   useEffect(() => {
     const fetchPrescriptionHistory = async () => {
       try {
-        const response = await axios.get(`http://192.168.31.145:7002/v1/prescriptions/patient/${patientId}`);
+        const response = await axios.get(`http://10.52.4.152:7002/v1/prescriptions/patient/${patientId}`);
         console.log(response.data.prescription_ids)
         setPrescriptionIds(response.data.prescription_ids);
       } catch (err) {

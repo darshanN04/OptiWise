@@ -3,6 +3,8 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TouchableOpacity
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL, PORT } from '@env';
+import { Link } from "expo-router";
+
 
 const { width } = Dimensions.get('window');
 
@@ -28,7 +30,7 @@ const Profile = () => {
           console.log(`API_URL: ${API_URL}, PORT: ${PORT}`);
 
           // Fetch doctor profile from the backend
-          const response = await fetch(`http://192.168.31.145:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
+          const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/profile?email=${storedEmail}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -64,7 +66,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`http://192.168.31.145:${PORT}/v1/doctor/logout`, {
+      const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/logout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -91,9 +93,16 @@ const Profile = () => {
   // Conditionally rendering based on loading, error, and fetched data
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <Image source={require('../../assets/images/Logo1.png')} style={styles.logo} />
-        <Text style={styles.headerTitle}>Profile</Text>
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
+          />
+        </Link>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Profile</Text>
+        </View>
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -153,27 +162,32 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
     height: 200,
-    backgroundColor: '#FF4545',
+    backgroundColor: "#FF4545",
     width: width,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    position: "absolute",
     zIndex: 10,
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
   },
   logo: {
     width: 70,
     height: 60,
     position: 'absolute',
-    top: 40,
-    right: 20,
+    top: 50,
+    left: 20,
   },
-  headerTitle: {
+  headerText: {
     fontSize: 30,
+    color: "white",
+    alignSelf: "center",
     color: 'white',
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 20
   },
   scrollContainer: {
     flexGrow: 1,

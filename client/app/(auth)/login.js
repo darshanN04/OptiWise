@@ -26,8 +26,6 @@ export default function Login({ navigation }) {
     };
     hideSplash();
   }, []);
-
-  // Clear state function
   const clearState = () => {
     setForm({ email: "", password: "" });
     setShowPassword(false);
@@ -37,17 +35,16 @@ export default function Login({ navigation }) {
   };
 
   const logIn = async (email, password) => {
-    console.log('logIn function called with:', email, password); // Debugging log
+    console.log('logIn function called with:', email, password); 
 
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setErrorModalVisible(true);
-      router.push('../(tabs)/Registration');
       return;
     }
     
     try {
-      const response = await fetch(`http://192.168.31.145:${PORT}/v1/doctor/login`,{
+      const response = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/login`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,13 +56,17 @@ export default function Login({ navigation }) {
 
       if (response.ok) {
         console.log('Login successful'); 
+        const doctorRoleResponse = await fetch(`http://10.52.4.152:${PORT}/v1/doctor/roleID?email=${email}`);
+        const doctorRoleResult = await doctorRoleResponse.json();
+        await AsyncStorage.setItem('doctorRole', doctorRoleResult.role.toString());
+
         await AsyncStorage.setItem('accessToken', result.accessToken);
         await AsyncStorage.setItem('doctorEmail', result.email);
 
         setSuccessModalVisible(true); 
         setTimeout(() => {
           setSuccessModalVisible(false);
-          clearState(); // Clear form state after login
+          clearState(); 
           router.push('../(tabs)/Registration');
         }, 2000); 
       } else {

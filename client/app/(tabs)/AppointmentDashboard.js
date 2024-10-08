@@ -9,7 +9,7 @@ const AppointmentDashboard = () => {
 
   const fetchTokens = async () => {
     try {
-      const response = await fetch('http://192.168.31.145:7002/v1/appointments/tokens');
+      const response = await fetch('http://10.52.4.152:7002/v1/appointments/tokens');
       const data = await response.json();
       setTokens(data.tokens); 
     } catch (error) {
@@ -25,9 +25,16 @@ const AppointmentDashboard = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <Image source={require('../../assets/images/Logo1.png')} style={styles.logo} />
-        <Text style={styles.headerText}>Appointment Dashboard</Text>
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
+          />
+        </Link>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Appointment Dashboard</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -50,26 +57,32 @@ const AppointmentDashboard = () => {
 export default AppointmentDashboard;
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
     height: 200,
     backgroundColor: "#FF4545",
     width: width,
     position: "absolute",
     zIndex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
   },
   logo: {
     width: 70,
     height: 60,
-    marginTop: 40,
-    marginLeft: 300,
+    position: 'absolute',
+    top: 50,
+    left: 20,
   },
   headerText: {
     fontSize: 30,
-    marginTop: 10,
     color: "white",
-    textAlign: 'center',
+    alignSelf: "center",
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: 20
   },
   scrollViewContainer: {
     flexGrow: 1,
@@ -85,6 +98,8 @@ const styles = StyleSheet.create({
     width: width * 0.20,
     height: width * 0.20,
     backgroundColor: '#FFCCCB',
+    paddingLeft: 10,
+    flex:1,
     justifyContent: 'center',
     alignItems: 'center',
     margin: 5,
@@ -94,5 +109,8 @@ const styles = StyleSheet.create({
   tokenText: {
     fontSize: 24,
     fontWeight: 'bold',
+    flex:1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -1,6 +1,8 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, TouchableOpacity, Modal, Pressable, Clipboard } from 'react-native';
 import { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Link } from "expo-router";
+
 
 const { width } = Dimensions.get('window');
 
@@ -38,7 +40,7 @@ const Appointment = () => {
 
       const queryString = query.join('&');
 
-      const response = await fetch(`http://192.168.31.145:7002/v1/patients/search?${queryString}`);
+      const response = await fetch(`http://10.52.4.152:7002/v1/patients/search?${queryString}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -64,7 +66,7 @@ const Appointment = () => {
     }
 
     try {
-      const response = await fetch('http://192.168.31.145:7002/v1/appointments/create', {
+      const response = await fetch('http://10.52.4.152:7002/v1/appointments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,9 +98,16 @@ const Appointment = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image source={require('../../assets/images/Logo1.png')} style={styles.logo} />
-        <Text style={styles.headerText}>Appointment</Text>
+      <View style={styles.headerContainer}>
+        <Link href="../(profile)/profile" style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/Logo1.png")}
+            style={styles.logo}
+          />
+        </Link>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Appointment</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -238,15 +247,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
+  headerContainer: {
     height: 200,
     backgroundColor: "#FF4545",
     width: width,
     position: "absolute",
     zIndex: 10,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 20,
+  },
+  logoContainer: {
+    height: 100,
+    left: width * 0.05,
+    top: 25,
   },
   logo: {
     width: 70,
@@ -256,9 +267,12 @@ const styles = StyleSheet.create({
     left: 20,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 30,
+    color: "white",
+    alignSelf: "center",
     color: 'white',
     fontWeight: 'bold',
+    marginTop: 20
   },
   scrollViewContent: {
     paddingTop: 150,

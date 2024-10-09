@@ -14,7 +14,7 @@ const PrescriptionView = () => {
   useEffect(() => {
     const fetchPrescriptionDetails = async () => {
       try {
-        const response = await axios.get(`http://192.168.0.170:7002/v1/prescription/${prescriptionId}`);
+        const response = await axios.get(`http://192.168.165.145:7002/v1/prescription/${prescriptionId}`);
         setPrescriptionDetails(response.data);
       } catch (err) {
         if (err.response) {

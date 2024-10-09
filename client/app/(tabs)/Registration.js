@@ -72,7 +72,7 @@ const patientReg = () => {
   const handleSubmit = async () => {
     if (validateInputs()) {
       try {
-        const response = await axios.post(`http://192.168.0.170:${PORT}/v1/patients/register`, details);
+        const response = await axios.post(`http://192.168.165.145:${PORT}/v1/patients/register`, details);
         console.log(details);
         if (response.status === 200) {
           alert(`Patient Registered Successfully. Patient ID: ${response.data.patient_id}`);
@@ -297,14 +297,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    height: 150,
+    height: 210,
     backgroundColor: "transparent",
     width: width,
     position: "absolute",
-    zIndex: 1000,
-  },
-  scrollViewContent: {
-    marginTop: 60,
+    zIndex: 10,
   },
   logoContainer: {
     height: 100,
@@ -319,11 +316,16 @@ const styles = StyleSheet.create({
     left: 20,
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 25,
     color: "#450F81",
     alignSelf: "center",
     fontWeight: 'bold',
-    marginTop: 5
+    marginTop: 0,
+    paddingBottom: 20
+
+  },
+  scrollViewContent: {
+    marginTop: 60,
   },
   inputContainer: {
     backgroundColor: '#FFFFFFAA',

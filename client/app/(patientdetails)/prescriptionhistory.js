@@ -13,7 +13,7 @@ const PrescriptionHistory = () => {
   useEffect(() => {
     const fetchPrescriptionHistory = async () => {
       try {
-        const response = await axios.get(`http://192.168.0.170:7002/v1/prescriptions/patient/${patientId}`);
+        const response = await axios.get(`http://192.168.165.145:7002/v1/prescriptions/patient/${patientId}`);
         console.log(response.data.prescription_ids)
         setPrescriptionIds(response.data.prescription_ids);
       } catch (err) {

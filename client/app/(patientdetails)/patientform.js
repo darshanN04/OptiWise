@@ -12,7 +12,7 @@ const PatientForm = () => {
     try {
       console.log(`Fetching patient details for patient ID: ${patientId}`); 
 
-      const response = await fetch(`http://192.168.0.170:7002/v1/patients/${patientId}`);
+      const response = await fetch(`http://192.168.165.145:7002/v1/patients/${patientId}`);
       const data = await response.json();
 
       console.log('Raw response data:', data); 
@@ -190,8 +190,8 @@ const PatientForm = () => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <Link href="../(tabs)Patient Details" style={styles.button}>
-              <Text>Submit</Text>
+            <Link href="../(tabs)/PatientDetails" style={styles.button}>
+              <Text>BACK</Text>
             </Link>
           </View>
         </View>

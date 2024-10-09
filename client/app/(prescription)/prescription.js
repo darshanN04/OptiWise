@@ -14,7 +14,6 @@ import { BlurView } from 'expo-blur';
 
 
 
-
 const { width } = Dimensions.get('window'); 
 
  const Prescription = () => {
@@ -23,7 +22,7 @@ const { width } = Dimensions.get('window');
   
     const fetchPatientId = async (token) => {
       try {
-        const response = await fetch(`http://192.168.0.170:7002/v1/appointments/patientid?token=${token}`); 
+        const response = await fetch(`http://192.168.165.145:7002/v1/appointments/patientid?token=${token}`); 
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -38,7 +37,7 @@ const { width } = Dimensions.get('window');
     };
     const getPatientNameById = async (patientId) => {
       try {
-        const response = await fetch(`http://192.168.0.170:7002/v1/patients/name/${patientId}`);
+        const response = await fetch(`http://192.168.165.145:7002/v1/patients/name/${patientId}`);
   
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -170,7 +169,7 @@ const { width } = Dimensions.get('window');
     try {
       const email = await AsyncStorage.getItem('doctorEmail'); // Replace with your actual key
       if (email) {
-        const response = await fetch(`http://192.168.0.170:7002/v1/doctor/doctorsid?email=${email}`);
+        const response = await fetch(`http://192.168.165.145:7002/v1/doctor/doctorsid?email=${email}`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -199,7 +198,7 @@ const { width } = Dimensions.get('window');
 
   const submitPrescription = async () => {
     try {
-        const response = await fetch('http://192.168.0.170:7002/v1/prescriptions/add', {
+        const response = await fetch('http://192.168.165.145:7002/v1/prescriptions/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -272,6 +271,11 @@ const { width } = Dimensions.get('window');
 
 
 return (
+  <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
   <View style={{ flex: 1 }}>
     <View style={styles.headerContainer}>
       <BlurView intensity={50} style={styles.blurContainer}>
@@ -353,7 +357,7 @@ return (
         <ScrollView horizontal={true} style={{flex:1, flexDirection: "row"}}>
           <View>
         {/* Right EYE */}
-            <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
+            <View style={{backgroundColor: "rgba(255,218,185,45)", flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10, width: width*0.95, marginLeft: 5}}>
                 <View>
                   <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Right :</Text>
                 </View>
@@ -513,7 +517,7 @@ return (
 
         {/* ___LEFT EYE____ */}
         <View>
-          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10}}>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(125, 249, 255, 12)", borderRadius: 40, margin: 15, paddingBottom: 30,elevation: 10, width: width*0.95, marginRight: 5}}>
           <View>
           <Text style={{ fontSize: 30, marginBottom: 0, marginTop: 20, textAlign: "center", textDecorationLine:"underline" }}>Left :</Text>
           </View>
@@ -764,7 +768,7 @@ return (
 
         <View style={styles.buttonContainer}>
   <Link 
-    href=""// Keep the path empty or use "#" to stay on the same screen
+    href="../(tabs)/AppointmentDashboard"// Keep the path empty or use "#" to stay on the same screen
     style={styles.button} 
     onPress={submitPrescription} // Call submitPrescription on button press
   >
@@ -775,15 +779,19 @@ return (
       </View>
     </ScrollView>
   </View>
+  </LinearGradient>
 );
 };
 
 export default Prescription;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerContainer: {
     height: 200,
-    backgroundColor: "#FF4545",
+    backgroundColor: "transparent",
     width: width,
     position: "absolute",
     zIndex: 10,
@@ -802,11 +810,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 30,
-    color: "white",
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: 20,
+    paddingBottom:20
   },
 inputContainer: {
   width: 150,

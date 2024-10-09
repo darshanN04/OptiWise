@@ -2,6 +2,8 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Touch
 import { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Link } from "expo-router";
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const { width } = Dimensions.get('window');
@@ -40,7 +42,7 @@ const Appointment = () => {
 
       const queryString = query.join('&');
 
-      const response = await fetch(`http://192.168.0.170:7002/v1/patients/search?${queryString}`);
+      const response = await fetch(`http://192.168.165.145:7002/v1/patients/search?${queryString}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -66,7 +68,7 @@ const Appointment = () => {
     }
 
     try {
-      const response = await fetch('http://192.168.0.170:7002/v1/appointments/create', {
+      const response = await fetch('http://192.168.165.145:7002/v1/appointments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,19 +99,25 @@ const Appointment = () => {
   };
 
   return (
+    <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Link href="../(profile)/profile" style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/images/Logo1.png")}
-            style={styles.logo}
-          />
-        </Link>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Appointment</Text>
-        </View>
+        <BlurView intensity={100} blurAmount={130} tint="light"style={styles.blurContainer}>
+          <Link href="../(profile)/profile" style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/images/Logo1.png")}
+              style={styles.logo}
+            />
+          </Link>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerText}>Appointment</Text>
+          </View>
+        </BlurView>
       </View>
-
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.formContainer}>
           <View style={styles.inputGroup}>
@@ -238,6 +246,7 @@ const Appointment = () => {
         </View>
       </Modal>
     </View>
+    </LinearGradient>
   );
 };
 
@@ -248,8 +257,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    height: 200,
-    backgroundColor: "#FF4545",
+    height: 150,
+    backgroundColor: "white",
     width: width,
     position: "absolute",
     zIndex: 10,
@@ -267,12 +276,12 @@ const styles = StyleSheet.create({
     left: 20,
   },
   headerText: {
-    fontSize: 30,
-    color: "white",
+    fontSize: 25,
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: 0,
+    paddingBottom: 20
   },
   scrollViewContent: {
     paddingTop: 150,

@@ -1,5 +1,5 @@
-import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput } from 'react-native';
-import React from 'react';
+import { ScrollView, StyleSheet, Text, View, Image, Dimensions, TextInput, Button, Alert } from 'react-native';
+import React, { useState } from 'react';
 import { Link, useLocalSearchParams } from 'expo-router';
 import "../../assets/images/Logo.png";
 
@@ -7,6 +7,48 @@ const { width } = Dimensions.get('window'); // Get the screen width
 
 const MedicalHistory = () => {
   const { patientId } = useLocalSearchParams(); // Retrieve the patientId from query params
+
+  // State variables for medical details
+  const [medicalCondition, setMedicalCondition] = useState('');
+  const [currentMedication, setCurrentMedication] = useState('');
+  const [allergies, setAllergies] = useState('');
+
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://192.168.165.145:7002/v1/prescriptions/updateMedicalDetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: patientId,
+          medical_history: medicalCondition,
+          current_medication: currentMedication,
+          allergies: allergies,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit medical details');
+      }
+
+      console.log('Medical details submitted successfully:', data);
+
+      // Show success alert
+      Alert.alert('Success', 'Medical details updated successfully!', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+
+    } catch (error) {
+      console.error('Error submitting medical details:', error);
+      Alert.alert('Error', 'Failed to update medical details. Please try again later.', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -27,10 +69,10 @@ const MedicalHistory = () => {
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
         style={{ paddingTop: 200, width: width }}
       >
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-  <Text>Patient No.</Text>
-  <Text>{patientId}</Text>
-</View>
+        <View style={{ alignItems: "center", marginBottom: 20 }}>
+          <Text>Patient No.</Text>
+          <Text>{patientId}</Text>
+        </View>
 
         {/* Medical Information Sections */}
         <View style={{ alignItems: 'center' }}>
@@ -40,6 +82,8 @@ const MedicalHistory = () => {
             <TextInput
               style={styles.input}
               multiline={true}
+              value={medicalCondition}
+              onChangeText={setMedicalCondition} // Update state on change
             />
           </View>
 
@@ -49,6 +93,8 @@ const MedicalHistory = () => {
             <TextInput
               style={styles.input}
               multiline={true}
+              value={currentMedication}
+              onChangeText={setCurrentMedication} // Update state on change
             />
           </View>
 
@@ -58,14 +104,14 @@ const MedicalHistory = () => {
             <TextInput
               style={styles.input}
               multiline={true}
+              value={allergies}
+              onChangeText={setAllergies} // Update state on change
             />
           </View>
         </View>
 
         <View style={styles.buttonContainer}>
-          <Link href="../(patientdetails)/patientform" style={styles.button}>
-            <Text>Search</Text>
-          </Link>
+          <Button title="SUBMIT" onPress={handleSubmit} color="#007bff" />
         </View>
       </ScrollView>
     </View>
@@ -78,19 +124,19 @@ const styles = StyleSheet.create({
   inputContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "rgba(155, 219, 255, 1)", // Adjust the background opacity
+    backgroundColor: "rgba(155, 219, 255, 1)",
     borderRadius: 40,
     margin: 15,
     paddingBottom: 20,
     elevation: 10,
-    width: width * 0.8, // Make sure the width adapts to the screen width
+    width: width * 0.8,
     marginBottom: 10
   },
   input: {
     height: 200,
     width: 250,
     backgroundColor: "white",
-    textAlignVertical: "top", // Ensure text starts from the top
+    textAlignVertical: "top",
     padding: 10,
     marginLeft: 10,
     marginRight: 10,
@@ -100,16 +146,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     marginBottom: 200
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    color: 'white',
-    textAlign: 'center',
-    borderRadius: 5,
-    margin: 10,
-    width: 100,
-    marginTop: 20,
-    fontSize: 15
   },
 });

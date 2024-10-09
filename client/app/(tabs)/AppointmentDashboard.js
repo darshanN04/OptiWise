@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View, Image, Dimensions } from 'react-nat
 import React, { useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router'; // Import Link from expo-router
+import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 const { height } = Dimensions.get('window');
@@ -11,7 +12,7 @@ const AppointmentDashboard = () => {
 
   const fetchTokens = async () => {
     try {
-      const response = await fetch('http://192.168.0.170:7002/v1/appointments/tokens');
+      const response = await fetch('http://192.168.165.145:7002/v1/appointments/tokens');
       const data = await response.json();
       setTokens(data.tokens); 
     } catch (error) {
@@ -28,20 +29,20 @@ const AppointmentDashboard = () => {
   return (
     <LinearGradient
       colors={['#FFFFFF', '#0ACDD6']}
-      locations={[0.10, 1]}
+      locations={[0.1, 1]}
       style={styles.container}
     >
     <View style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
-        <Link href="../(profile)/profile" style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/images/Logo1.png")}
-            style={styles.logo}
-          />
-        </Link>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Appointment Dashboard</Text>
-        </View>
+          <Link href="../(profile)/profile" style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/images/Logo1.png")}
+              style={styles.logo}
+            />
+          </Link>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerText}>Token Dashboard</Text>
+          </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -74,6 +75,8 @@ const styles = StyleSheet.create({
     width: width,
     position: "absolute",
     zIndex: 10,
+    marginTop: -10,
+    marginLeft: -10,
   },
   logoContainer: {
     height: 100,
@@ -92,11 +95,14 @@ const styles = StyleSheet.create({
     color: "#450F81",
     alignSelf: "center",
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: 0,
+    paddingBottom: 20
+
   },
   scrollViewContainer: {
     flexGrow: 1,
-    paddingTop: 220,
+    paddingTop: 160,
+    marginLeft: 2,
   },
   container: {
     flexDirection: 'row',

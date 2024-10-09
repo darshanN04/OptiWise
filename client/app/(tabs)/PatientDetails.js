@@ -14,6 +14,8 @@ import {
 import React, { useState } from "react";
 import { Link } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get("window");
 
@@ -43,7 +45,7 @@ const PatientDetails = () => {
 
       const queryString = query.join("&");
       const response = await fetch(
-        `http://192.168.0.170:7002/v1/patients/search?${queryString}`
+        `http://192.168.165.145:7002/v1/patients/search?${queryString}`
       );
       const data = await response.json();
 
@@ -69,6 +71,7 @@ const PatientDetails = () => {
   };
 
   const renderPatient = ({ item }) => (
+    
     <View key={item.patient_id} style={styles.patientResult}>
       <Link
         href={`../(patientdetails)/patientform?patientId=${item.patient_id}`}
@@ -88,17 +91,24 @@ const PatientDetails = () => {
   );
   
   return (
+    <LinearGradient
+      colors={['#FFFFFF', '#0ACDD6']}
+      locations={[0.10, 1]}
+      style={styles.container}
+    >
     <View style={{ flex: 1 }}>
       <View style={styles.headerContainer}>
-        <Link href="../(profile)/profile" style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/images/Logo1.png")}
-            style={styles.logo}
-          />
-        </Link>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Patient Details</Text>
-        </View>
+        <BlurView intensity={100} blurAmount={130} tint="light"style={styles.blurContainer}>
+          <Link href="../(profile)/profile" style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/images/Logo1.png")}
+              style={styles.logo}
+            />
+          </Link>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerText}>Patient Details</Text>
+          </View>
+        </BlurView>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -115,6 +125,7 @@ const PatientDetails = () => {
             <TextInput
               style={styles.inputField}
               placeholder="Patient Name"
+              placeholderTextColor='black'
               value={searchDetails.patientName}
               onChangeText={(text) =>
                 setSearchDetails({ ...searchDetails, patientName: text })
@@ -132,6 +143,7 @@ const PatientDetails = () => {
             <TextInput
               style={styles.inputField}
               placeholder="Patient Phone No."
+              placeholderTextColor='black'
               value={searchDetails.patientPhone}
               onChangeText={(text) =>
                 setSearchDetails({ ...searchDetails, patientPhone: text })
@@ -192,15 +204,19 @@ const PatientDetails = () => {
         </View>
       </ScrollView>
     </View>
+    </LinearGradient>
   );
 };
 
 export default PatientDetails;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerContainer: {
-    height: 200,
-    backgroundColor: "#FF4545",
+    height: 150,
+    backgroundColor: "transparent",
     width: width,
     position: "absolute",
     zIndex: 10,
@@ -218,12 +234,13 @@ const styles = StyleSheet.create({
     left: 20,
   },
   headerText: {
-    fontSize: 30,
-    color: "white",
+    fontSize: 25,
+    color: "#450F81",
     alignSelf: "center",
-    color: 'white',
     fontWeight: 'bold',
-    marginTop: 20
+    marginTop: 0,
+    paddingBottom: 20
+
   },
   searchContainer: {
     flex: 1,
@@ -237,10 +254,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-    width: "80%",
+    width: '80%',
+    backgroundColor: '#FFFFFFAA',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'purple',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    marginBottom: 25,
+    paddingVertical: 5, // Reduced margin to close gap between input and error
   },
   inputIcon: {
     marginRight: 10,
@@ -257,7 +280,7 @@ const styles = StyleSheet.create({
     width: 150,
     padding: 10,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 5,
     elevation: 8,
   },
   resetButton: {
@@ -265,7 +288,7 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 150,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 30,
     elevation: 8,
   },
   searchButtonText: {

@@ -175,9 +175,62 @@ const addPrescription = async (req, res) => {
         return res.status(500).json({ error: 'Server error', details: err.message });
     }
 };
+const updateMedicalDetails = async (req, res) => {
+    const { patient_id, medical_history, current_medication, allergies } = req.body;
+
+    // Check if required parameters are present
+    if (!patient_id) {
+        return res.status(400).json({ error: 'Patient ID is required' });
+    }
+
+    try {
+        // Fetch the existing details for the patient
+        const { data: existingDetails, error: fetchError } = await supabase
+            .from('additional_details')
+            .select('*')
+            .eq('patient_id', patient_id)
+            .single();
+
+        if (fetchError) {
+            console.error('Error fetching existing details:', fetchError);
+            return res.status(500).json({ error: 'Failed to fetch existing details' });
+        }
+
+        // Prepare the new values
+        const updatedMedicalHistory = existingDetails.medical_history ? 
+            `${existingDetails.medical_history}, ${medical_history}` : medical_history;
+        const updatedCurrentMedication = existingDetails.current_medication ? 
+            `${existingDetails.current_medication}, ${current_medication}` : current_medication;
+        const updatedAllergies = existingDetails.allergies ? 
+            `${existingDetails.allergies}, ${allergies}` : allergies;
+
+        // Update the details in the database
+        const { error: updateError } = await supabase
+            .from('additional_details')
+            .update({
+                medical_history: updatedMedicalHistory,
+                current_medication: updatedCurrentMedication,
+                allergies: updatedAllergies
+            })
+            .eq('patient_id', patient_id);
+
+        if (updateError) {
+            console.error('Error updating medical details:', updateError);
+            return res.status(500).json({ error: 'Failed to update medical details' });
+        }
+
+        return res.status(200).json({ message: 'Medical details updated successfully' });
+
+    } catch (err) {
+        console.error('Server Error:', err);
+        return res.status(500).json({ error: 'Server error', details: err.message });
+    }
+};
 
 
 
 
 
-export { getPrescriptionIds,getPrescriptionById,getPrescriptionDetails,addPrescription} 
+
+
+export { getPrescriptionIds,getPrescriptionById,getPrescriptionDetails,addPrescription,updateMedicalDetails} 

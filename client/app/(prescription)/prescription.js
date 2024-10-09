@@ -162,6 +162,7 @@ const { width } = Dimensions.get('window');
   const [checked9, setChecked9] = useState(false);
   const [checked10, setChecked10] = useState(false);
   const [checked11, setChecked11] = useState(false);
+  const [remarks, setRemarks] = useState('');
   const [isSliderActive, setIsSliderActive] = useState(false);
   const [doctorId, setDoctorId] = useState('');
 
@@ -241,7 +242,7 @@ const { width } = Dimensions.get('window');
                     checked10 && "Photosun",   // If checked10 is true, "Photosun" will be added
                     checked11 && "Photobrown", // If checked11 is true, "Photobrown" will be added
                 ].filter(Boolean).join(", "), // Convert array to comma-separated string
-                p_remarks: 'DV Only', // Replace with actual remarks
+                p_remarks: remarks, // Replace with actual remarks
                 bifocalOptions: [
                     checked1 && "KR",          // If checked1 is true, "KR" will be added
                     checked2 && "Exec",        // If checked2 is true, "Exec" will be added
@@ -749,6 +750,15 @@ return (
             editable={false} // Make the TextInput read-only, you can remove this if you want it editable
       />
         </View>
+        <View style={styles.inputContainerR}>
+    <Text style={styles.label}>Remarks</Text>
+    <TextInput
+        style={styles.inputR}
+        value={remarks}
+        onChangeText={setRemarks} // Updates the state whenever input changes
+        placeholder="Enter remarks"
+    />
+</View>
 
         {/* -----------------------Submit Button----------------------- */}
 
@@ -842,5 +852,21 @@ button: {
   width: 100,
   marginTop: 20,
   fontSize: 15
+},
+inputContainerR: {
+  marginVertical: 10,
+  marginHorizontal:20,
+},
+label: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginBottom: 5,
+},
+inputR: {
+  height: 40,
+  borderColor: 'gray',
+  borderWidth: 1,
+  paddingHorizontal: 10,
+  borderRadius: 5,
 },
 });

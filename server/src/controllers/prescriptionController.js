@@ -101,7 +101,6 @@ const getPrescriptionDetails = async (req, res) => {
     }
 };
 const addPrescription = async (req, res) => {
-    console.log("add perer",req.body);
     // Extract necessary fields from request body
     const {
         p_id, // Patient ID
@@ -113,21 +112,17 @@ const addPrescription = async (req, res) => {
         r_sphere_dv, r_cyl_dv, r_axis_dv, r_vision_dv,
         r_sphere_nv, r_cyl_nv, r_axis_nv, r_vision_nv, // Right eye params
         p_ipd, p_remarks, // Prescription-related fields
-        bifocalOptions, // Array of selected bifocal options
-        colorOptions // Array of selected color options
+        bifocalOptions, // String of selected bifocal options
+        p_colour        // String of selected colour options
     } = req.body;
 
-    // Check if required parameters are present
-    if (!p_id || !d_id) {
-        return res.status(400).json({ error: 'Patient ID and Doctor ID are required' });
-    }
+    // Debug: Log incoming request body
+    console.log('Received Request Body:', req.body);
 
-    // Create a comma-separated string for bifocal options
-    const bifocalString = Array.isArray(bifocalOptions) ? bifocalOptions : ""; // Safely handle undefined or non-array
+    // Debug: Check bifocal and color strings
+    console.log('Bifocal Options (String):', bifocalOptions);
+    console.log('Color Options (String):', p_colour);
 
-    // Create a comma-separated string for color options
-    const colorString = Array.isArray(colorOptions) ? colorOptions : ""; // Safely handle undefined or non-array
-    console.log(bifocalString, typeof bifocalOptions, Array.isArray(bifocalOptions));
     try {
         // Call the Supabase RPC function for adding the prescription
         const { data, error } = await supabase.rpc('add_prescription', {
@@ -158,18 +153,20 @@ const addPrescription = async (req, res) => {
             r_axis_nv,
             r_vision_nv,
             p_ipd,
-            p_bifocal: bifocalString, // Use the bifocalString here
-            p_colour: colorString, // Use the colorString here
+            p_bifocal: bifocalOptions, // Use the bifocal string directly
+            p_colour,                   // Use the color string directly
             p_remarks
         });
 
-        // Check for errors from the RPC call
+        // Debug: Check if there's any error from Supabase
+        console.log('Supabase Response:', data);
         if (error) {
             console.error('Supabase Error:', error);
             return res.status(500).json({ error: error.message });
         }
 
         // If the function was successful, return the prescription ID
+        console.log('Prescription added successfully, ID:', data);
         return res.status(200).json({ message: 'Prescription added successfully', prescription_id: data });
 
     } catch (err) {
@@ -178,6 +175,7 @@ const addPrescription = async (req, res) => {
         return res.status(500).json({ error: 'Server error', details: err.message });
     }
 };
+
 
 
 
